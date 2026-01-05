@@ -1,5 +1,6 @@
 package com.ga.showroom.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,14 +34,18 @@ public class Order {
     @Column
     private boolean isApproved;
 
-    // TODO: with user
-    private User customerId;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private User customer;
 
-    // TODO: with user
-    private User salesmanId;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "salesman_id")
+    private User salesman;
 
-    // TODO: list of orderLines
-    //private List<orderLine> orderLines;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "order", orphanRemoval = true)
+    private List<OrderLine> orderLines;
 
     @CreationTimestamp
     @Column

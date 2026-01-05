@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -27,6 +29,15 @@ public class User {
 
     @Column
     private String role;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "customer", orphanRemoval = true)
+    private List<Order> ordersRequested;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "salesman", orphanRemoval = true)
+    private List<Order> ordersMonitored;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "owner", orphanRemoval = true)
+    private List<Car> cars;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", referencedColumnName = "id")

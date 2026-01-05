@@ -1,5 +1,6 @@
 package com.ga.showroom.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,17 +37,23 @@ public class Car {
     @Column
     private String image;
 
-    // TODO: with user
-    //private User customer;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private User owner;
 
-    // TODO: with model
-    //private CarModel carModel;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "car_model_id")
+    private CarModel carModel;
 
-    // TODO: with orderLine
-    //private OrderLine orderLine;
+    @JsonIgnore
+    @OneToOne(mappedBy = "car", fetch = FetchType.EAGER)
+    private OrderLine orderLine;
 
-    // TODO: with orderLine
-    //private List<CarOption> carOptions;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "car", orphanRemoval = true)
+    private List<CarOption> carOptions;
 
     @CreationTimestamp
     @Column

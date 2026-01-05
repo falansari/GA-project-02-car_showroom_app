@@ -1,5 +1,6 @@
 package com.ga.showroom.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,11 +23,17 @@ public class CarOption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // TODO: with option
-    //private Option option;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "option_id")
+    private Option option;
 
     // TODO: with option
-    //private Car car;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "car_id")
+    private Car car;
 
 
     @CreationTimestamp

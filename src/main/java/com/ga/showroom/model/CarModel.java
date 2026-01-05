@@ -1,5 +1,6 @@
 package com.ga.showroom.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,11 +40,11 @@ public class CarModel {
     @Column
     private double price;
 
-    // TODO: with user
-    //private Car car;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "carModel", orphanRemoval = true)
+    private List<Car> cars;
 
-    // TODO: list of options
-    //private List<option> options;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "carModel", orphanRemoval = true)
+    private List<Option> options;
 
     @CreationTimestamp
     @Column
