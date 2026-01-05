@@ -5,46 +5,33 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.catalina.User;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter@Getter
+@Setter
+@Getter
 @Entity
-@Table(name = "orders")
-public class Order {
+@Table(name = "optionCategories")
+public class OptionCategory {
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    private double totalPrice;
-
-    @Column
-    private LocalDateTime orderDate;
-
-    @Column
-    private boolean isApproved;
-
-    // TODO: with user
-    private User customerId;
-
-    // TODO: with user
-    private User salesmanId;
-
-    // TODO: list of orderLines
-    //private List<orderLine> orderLines;
+    private String name;
 
     @CreationTimestamp
     @Column
     private LocalDateTime createdAt;
+
+    // TODO: list of options
+    //private List<Option> options;
 
     @UpdateTimestamp
     @Column
