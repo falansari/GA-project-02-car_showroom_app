@@ -1,9 +1,66 @@
-HELP.md
-target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-*.properties
+# ===============================
+# Build output
+# ===============================
+/target/        # Maven
+/build/         # Gradle
+
+# ===============================
+# IDE / Editor files
+# ===============================
+# IntelliJ IDEA
+*.iml
+.idea/
+out/
+*.class
+.idea
+*.iws
+*.ipr
+
+# VS Code
+.vscode/
+
+# NetBeans
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ===============================
+# OS-specific files
+# ===============================
+.DS_Store
+Thumbs.db
+
+# ===============================
+# Logs
+# ===============================
+*.log
+
+# ===============================
+# Spring Boot config files (local only)
+# ===============================
+application.properties
+application.yml
+
+# ===============================
+# Database files
+# ===============================
+*.db
+*.sql
+
+# ===============================
+# Environment files
+# ===============================
+.env
 
 ### STS ###
 .apt_generated
@@ -14,49 +71,12 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
-
-# Maven build output
-/target/
-
-# Gradle build output
-/build/
-
-# IDE files
-.idea/
-*.class
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-
-# Spring Boot config files (local only)
-application.properties
-application.yml
-
-# Database files
-*.db
-*.sql
-
-# Environment files
-.env
+# ===============================
+# Other files
+# ===============================
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+*.properties
