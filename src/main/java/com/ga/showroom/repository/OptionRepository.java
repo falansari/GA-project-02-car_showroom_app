@@ -2,9 +2,11 @@ package com.ga.showroom.repository;
 
 import com.ga.showroom.model.Option;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface OptionRepository extends JpaRepository<Option, Long> {
     /**
      * Find option by its name
