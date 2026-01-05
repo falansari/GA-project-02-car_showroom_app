@@ -3,7 +3,7 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-src/main/resources/application.properties
+*.properties
 
 ### STS ###
 .apt_generated
@@ -32,3 +32,31 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Maven build output
+/target/
+
+# Gradle build output
+/build/
+
+# IDE files
+.idea/
+*.class
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Spring Boot config files (local only)
+application.properties
+application.yml
+
+# Database files
+*.db
+*.sql
+
+# Environment files
+.env
