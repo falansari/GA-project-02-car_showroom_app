@@ -18,10 +18,10 @@ public interface CarRepository extends JpaRepository<Car, Long> {
 
     /**
      * Find a car by its insurance policy number
-     * @param insurancePolicyNumber String
+     * @param insurancePolicy String
      * @return Car
      */
-    Car findByInsurancePolicyNumber(String insurancePolicyNumber);
+    Car findByInsurancePolicy(String insurancePolicy);
 
     /**
      * Find a car by its VIN number
@@ -38,11 +38,11 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     List<Car> findByManufacturer(String manufacturer);
 
     /**
-     * Find all cars by their model name
-     * @param model String
+     * Find all cars by their model id
+     * @param modelId Long
      * @return List of Car
      */
-    List<Car> findByModel(String model);
+    List<Car> findByModelId(Long modelId);
 
     /**
      * Find all cars by their manufacturer name and model name
