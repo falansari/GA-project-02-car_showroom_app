@@ -29,7 +29,7 @@ public class Option {
     private String name;
 
     @Column
-    private double price;
+    private Double price;
 
     @JsonIgnore
     @ManyToOne

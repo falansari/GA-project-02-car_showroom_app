@@ -25,13 +25,13 @@ public class Order {
     private Long id;
 
     @Column
-    private double totalPrice;
+    private Double totalPrice;
 
     @Column
     private LocalDateTime orderDate;
 
     @Column
-    private boolean isApproved;
+    private Boolean isApproved;
 
     @JsonIgnore
     @ManyToOne

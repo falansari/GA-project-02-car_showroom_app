@@ -37,7 +37,7 @@ public class CarModel {
     private String image;
 
     @Column
-    private double price;
+    private Double price;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "carModel", orphanRemoval = true)
     private List<Car> cars;

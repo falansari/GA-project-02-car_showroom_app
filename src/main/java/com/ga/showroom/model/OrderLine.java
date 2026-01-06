@@ -34,7 +34,7 @@ public class OrderLine {
     private Car car;
 
     @Column
-    private double price;
+    private Double price;
 
     @CreationTimestamp
     @Column
