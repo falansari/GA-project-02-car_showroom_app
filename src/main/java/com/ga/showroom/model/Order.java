@@ -1,11 +1,11 @@
 package com.ga.showroom.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.catalina.User;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -25,22 +25,26 @@ public class Order {
     private Long id;
 
     @Column
-    private double totalPrice;
+    private Double totalPrice;
 
     @Column
     private LocalDateTime orderDate;
 
     @Column
-    private boolean isApproved;
+    private Boolean isApproved;
 
-    // TODO: with user
-    private User customerId;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private User customer;
 
-    // TODO: with user
-    private User salesmanId;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "salesman_id")
+    private User salesman;
 
-    // TODO: list of orderLines
-    //private List<orderLine> orderLines;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "order", orphanRemoval = true)
+    private List<OrderLine> orderLines;
 
     @CreationTimestamp
     @Column

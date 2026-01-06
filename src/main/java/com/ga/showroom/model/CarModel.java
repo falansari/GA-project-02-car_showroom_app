@@ -5,14 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.catalina.User;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.nio.file.Path;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,16 +31,19 @@ public class CarModel {
     private Year makeYear;
 
     @Column
+    private String manufacturer;
+
+    @Column
     private String image;
 
     @Column
-    private double price;
+    private Double price;
 
-    // TODO: with user
-    //private Car car;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "carModel", orphanRemoval = true)
+    private List<Car> cars;
 
-    // TODO: list of options
-    //private List<option> options;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "carModel", orphanRemoval = true)
+    private List<Option> options;
 
     @CreationTimestamp
     @Column

@@ -1,5 +1,6 @@
 package com.ga.showroom.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,14 +23,18 @@ public class OrderLine {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // TODO: with order
-    //private Order order;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
 
-    // TODO: with car
-    //private Car car;
+    @JsonIgnore
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "car_id", referencedColumnName = "id")
+    private Car car;
 
     @Column
-    private double price;
+    private Double price;
 
     @CreationTimestamp
     @Column
