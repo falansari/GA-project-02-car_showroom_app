@@ -1,15 +1,16 @@
 package com.ga.showroom.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.catalina.User;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,17 +29,20 @@ public class Option {
     private String name;
 
     @Column
-    private double price;
+    private Double price;
 
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "car_model_id")
+    private CarModel carModel;
 
-    // TODO: with model
-    //private carModel carModelId;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "option_category_id")
+    private OptionCategory optionCategory;
 
-    // TODO: with optionCategory
-    //private optionCategory optionCategoryId;
-
-    // TODO: with carOption
-    //private List<carOption> carOptionId;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "option", orphanRemoval = true)
+    private List<CarOption> carOptions;
 
     @CreationTimestamp
     @Column

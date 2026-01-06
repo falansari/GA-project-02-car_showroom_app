@@ -30,8 +30,8 @@ public class OptionCategory {
     @Column
     private LocalDateTime createdAt;
 
-    // TODO: list of options
-    //private List<Option> options;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "optionCategory", orphanRemoval = true)
+    private List<Option> options;
 
     @UpdateTimestamp
     @Column

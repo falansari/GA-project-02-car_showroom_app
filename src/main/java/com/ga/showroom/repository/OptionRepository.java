@@ -16,16 +16,9 @@ public interface OptionRepository extends JpaRepository<Option, Long> {
     Option findByName(String name);
 
     /**
-     * Find all options belonging to a car model
-     * @param carModelId Long
-     * @return List of Option
-     */
-    List<Option> FindAllByCarModelId(Long carModelId);
-
-    /**
      * Find all options belonging to an option category
      * @param optionCategoryId Long
      * @return List of Option
      */
-    List<Option> FindAllByOptionCategoryId(Long optionCategoryId);
+    List<Option> findAllByOptionCategoryId(Long optionCategoryId);
 }
