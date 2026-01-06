@@ -2,7 +2,9 @@ package com.ga.showroom.service;
 
 import com.ga.showroom.exception.InformationExistException;
 import com.ga.showroom.model.User;
+import com.ga.showroom.model.request.ChangePasswordRequest;
 import com.ga.showroom.model.request.LoginRequest;
+import com.ga.showroom.model.response.ChangePasswordResponse;
 import com.ga.showroom.model.response.LoginResponse;
 import com.ga.showroom.repository.UserRepository;
 import com.ga.showroom.security.JWTUtils;
@@ -66,6 +68,27 @@ public class UserService {
             return ResponseEntity.ok(new LoginResponse(JWT));
         } catch (Exception e) {
             return ResponseEntity.ok(new LoginResponse("Error : user name or password is incorrect"));
+        }
+    }
+
+    public static User getCurrentLoggedInUser() {
+        MyUserDetails userDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userDetails.getUser();
+    }
+
+    public ChangePasswordResponse changePassword(ChangePasswordRequest changePasswordRequest) {
+        User user = userRepository.findUserByUserName(UserService.getCurrentLoggedInUser().getUserName());
+
+        if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())) {
+            return new ChangePasswordResponse("Old password incorrect");
+        }
+
+        if (passwordEncoder.matches(changePasswordRequest.getNewPassword(), user.getPassword())) {
+            return new ChangePasswordResponse("New password cannot be the same as old password");
+        } else {
+            user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+             userRepository.save(user);
+             return new ChangePasswordResponse("Password for " + user.getUserName() + " has been changed successfully!");
         }
     }
 
