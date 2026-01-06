@@ -1,14 +1,13 @@
 package com.ga.showroom.controller;
 
 import com.ga.showroom.model.User;
+import com.ga.showroom.model.request.ChangePasswordRequest;
 import com.ga.showroom.model.request.LoginRequest;
+import com.ga.showroom.model.response.ChangePasswordResponse;
 import com.ga.showroom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/auth/users")
@@ -31,4 +30,11 @@ public class UserController {
         System.out.println("calling loginUser ==>");
         return userService.loginUser(loginRequest);
     }
+
+    @PutMapping("/changePassword")
+    public ChangePasswordResponse changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        System.out.println("calling changePassword ==>");
+        return userService.changePassword(changePasswordRequest);
+    }
+
 }
