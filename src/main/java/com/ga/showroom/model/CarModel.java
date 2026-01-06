@@ -5,12 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.catalina.User;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.nio.file.Path;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
 
@@ -31,6 +28,9 @@ public class CarModel {
 
     @Column
     private Year makeYear;
+
+    @Column
+    private String manufacturer;
 
     @Column
     private String image;
