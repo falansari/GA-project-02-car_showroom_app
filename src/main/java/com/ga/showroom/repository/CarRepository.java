@@ -31,24 +31,9 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     Car findByVinNumber(String vinNumber);
 
     /**
-     * Find all cars by their manufacturer's name
-     * @param manufacturer String
-     * @return List of Car
-     */
-    List<Car> findByManufacturer(String manufacturer);
-
-    /**
      * Find all cars by their model id
-     * @param modelId Long
+     * @param carModelId Long
      * @return List of Car
      */
-    List<Car> findByModelId(Long modelId);
-
-    /**
-     * Find all cars by their manufacturer name and model name
-     * @param manufacturer String
-     * @param model String
-     * @return List of Car
-     */
-    List<Car> findByManufacturerAndModel(String manufacturer, String model);
+    List<Car> findByCarModelId(Long carModelId);
 }

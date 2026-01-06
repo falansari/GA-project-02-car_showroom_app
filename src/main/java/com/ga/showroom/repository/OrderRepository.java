@@ -31,12 +31,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findAllBySalesmanId(Long salesmanId);
 
     /**
-     * Find all orders sorted ascending by total price
-     * @return List of Order
-     */
-    List<Order> findAllByTotalPrice();
-
-    /**
      * Find all orders between start and end date.
      * @param localDateTimeStart LocalDateTime
      * @param localDateTimeEnd LocalDateTime
