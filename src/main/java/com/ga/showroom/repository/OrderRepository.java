@@ -34,14 +34,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * Find all orders sorted ascending by total price
      * @return List of Order
      */
-    List<Order> findAllByTotalPriceAsc();
-
-
-    /**
-     * Find all orders sorted descending by total price
-     * @return List of Order
-     */
-    List<Order> findAllByTotalPriceDesc();
+    List<Order> findAllByTotalPrice();
 
     /**
      * Find all orders between start and end date.
