@@ -28,6 +28,7 @@ public class OrderLine {
     @JoinColumn(name = "order_id")
     private Order order;
 
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "car_id", referencedColumnName = "id")
     private Car car;

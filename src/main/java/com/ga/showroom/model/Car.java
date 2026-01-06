@@ -47,7 +47,6 @@ public class Car {
     @JoinColumn(name = "car_model_id")
     private CarModel carModel;
 
-    @JsonIgnore
     @OneToOne(mappedBy = "car", fetch = FetchType.EAGER)
     private OrderLine orderLine;
 

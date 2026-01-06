@@ -23,18 +23,15 @@ public class CarOption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "option_id")
     private Option option;
 
-    // TODO: with option
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "car_id")
     private Car car;
-
 
     @CreationTimestamp
     @Column
