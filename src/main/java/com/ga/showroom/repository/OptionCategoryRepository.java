@@ -14,17 +14,4 @@ public interface OptionCategoryRepository extends JpaRepository<OptionCategory, 
      * @return OptionCategory
      */
     OptionCategory findByName(String name);
-
-    /**
-     * Find all option categories sorted by name ascending
-     * @return List of OptionCategory
-     */
-    List<OptionCategory> findAllByOrderByNameAsc();
-
-
-    /**
-     * Find all option categories sorted by name descending
-     * @return List of OptionCategory
-     */
-    List<OptionCategory> findAllByOrderByNameDesc();
 }
