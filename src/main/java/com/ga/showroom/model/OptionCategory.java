@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
-@Table(name = "optionCategories")
+@Table(name = "option_categories")
 public class OptionCategory {
     @Id
     @Column
