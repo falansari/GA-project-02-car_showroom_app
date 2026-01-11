@@ -2,6 +2,7 @@ package com.ga.showroom.service;
 
 import com.ga.showroom.exception.InformationExistException;
 import com.ga.showroom.model.User;
+import com.ga.showroom.model.UserProfile;
 import com.ga.showroom.model.request.ChangePasswordRequest;
 import com.ga.showroom.model.request.LoginRequest;
 import com.ga.showroom.model.response.ChangePasswordResponse;
@@ -18,6 +19,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -97,4 +106,42 @@ public class UserService {
         }
     }
 
+    public UserProfile updateProfile(UserProfile userProfile, MultipartFile cprImage) {
+        User user = userRepository.findUserByEmailAddress(UserService.getCurrentLoggedInUser().getEmailAddress());
+
+        UserProfile profile = user.getUserProfile();
+
+        profile.setFirstName(userProfile.getFirstName());
+        profile.setLastName(userProfile.getLastName());
+        profile.setEmailAddress(userProfile.getEmailAddress());
+        profile.setPhoneNumber(userProfile.getPhoneNumber());
+        profile.setHomeAddress(userProfile.getHomeAddress());
+        profile.setCpr(userProfile.getCpr());
+
+        // handle CPR image upload
+        if (cprImage != null && !cprImage.isEmpty()) {
+            try {
+                String fileName = UUID.randomUUID() + "_" + cprImage.getOriginalFilename();
+
+                // better upload location (outside classpath)
+                Path uploadPath = Paths.get("uploads/cpr-images");
+                Files.createDirectories(uploadPath);
+
+                Files.copy(
+                        cprImage.getInputStream(),
+                        uploadPath.resolve(fileName),
+                        StandardCopyOption.REPLACE_EXISTING
+                );
+
+                // save filename in DB
+                profile.setCprImage(fileName);
+
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to upload CPR image", e);
+            }
+        }
+
+        userRepository.save(user);
+        return profile;
+    }
 }

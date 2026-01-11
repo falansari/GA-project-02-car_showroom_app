@@ -1,13 +1,16 @@
 package com.ga.showroom.controller;
 
 import com.ga.showroom.model.User;
+import com.ga.showroom.model.UserProfile;
 import com.ga.showroom.model.request.ChangePasswordRequest;
 import com.ga.showroom.model.request.LoginRequest;
 import com.ga.showroom.model.response.ChangePasswordResponse;
 import com.ga.showroom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(path = "/auth/users")
@@ -35,6 +38,12 @@ public class UserController {
     public ChangePasswordResponse changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
         System.out.println("calling changePassword ==>");
         return userService.changePassword(changePasswordRequest);
+    }
+    //@PutMapping("/updateProfile")
+    @PutMapping(path = "/updateProfile",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public UserProfile updateProfile(@RequestPart UserProfile userProfile, @RequestParam("cprImage") MultipartFile cprImage) {
+        System.out.println("calling updateProfile ==> ");
+        return userService.updateProfile(userProfile, cprImage);
     }
 
 }
