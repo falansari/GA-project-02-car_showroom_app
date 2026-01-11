@@ -42,7 +42,7 @@ public class UserService {
 
     public User createUser(User userObject) {
         System.out.println("service calling createUser ==> ");
-        if(!userRepository.existsByUserName(userObject.getUserName())){
+        if(!userRepository.existsByEmailAddress(userObject.getEmailAddress())){
             userObject.setPassword(passwordEncoder.encode(userObject.getPassword()));
             return userRepository.save(userObject);
         } else {
@@ -50,15 +50,15 @@ public class UserService {
         }
     }
 
-    public User findUserByUserName(String userName) {
-        return userRepository.findUserByUserName(userName);
+    public User findUserByEmailAddress(String email) {
+        return userRepository.findUserByEmailAddress(email);
     }
 
     public ResponseEntity<?> loginUser(LoginRequest loginRequest) {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getUserName(), loginRequest.getPassword());
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getEmailAddress(), loginRequest.getPassword());
         try {
             Authentication authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUserName(), loginRequest.getPassword()));
+                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmailAddress(), loginRequest.getPassword()));
             System.out.println("authentication :: "+authentication);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             myUserDetails = (MyUserDetails) authentication.getPrincipal();
@@ -71,13 +71,18 @@ public class UserService {
         }
     }
 
+    /**
+     * Get current logged in user
+     * @return
+     */
     public static User getCurrentLoggedInUser() {
         MyUserDetails userDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        assert userDetails != null;
         return userDetails.getUser();
     }
 
     public ChangePasswordResponse changePassword(ChangePasswordRequest changePasswordRequest) {
-        User user = userRepository.findUserByUserName(UserService.getCurrentLoggedInUser().getUserName());
+        User user = userRepository.findUserByEmailAddress(UserService.getCurrentLoggedInUser().getEmailAddress());
 
         if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())) {
             return new ChangePasswordResponse("Old password incorrect");
