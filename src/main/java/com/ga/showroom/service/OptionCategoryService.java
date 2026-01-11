@@ -3,18 +3,14 @@ package com.ga.showroom.service;
 import com.ga.showroom.exception.InformationExistException;
 import com.ga.showroom.exception.InformationNotFoundException;
 import com.ga.showroom.model.OptionCategory;
-import com.ga.showroom.model.User;
 import com.ga.showroom.repository.OptionCategoryRepository;
-import com.ga.showroom.security.MyUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
-import java.util.Objects;
+
+import static com.ga.showroom.service.UserService.getCurrentLoggedInUser;
 
 @Service
 @RequestMapping(path = "api/option-categories")
@@ -26,12 +22,7 @@ public class OptionCategoryService {
         this.optionCategoryRepository = optionCategoryRepository;
     }
 
-    public static User getCurrentLoggedInUser() {
-        MyUserDetails userDetails = (MyUserDetails) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal();
 
-        assert userDetails != null;
-        return userDetails.getUser();
-    }
 
     /**
      * Get an option category by its ID

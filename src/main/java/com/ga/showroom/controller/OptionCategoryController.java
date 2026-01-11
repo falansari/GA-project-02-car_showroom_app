@@ -34,8 +34,8 @@ public class OptionCategoryController {
      * @param optionCategoryName String
      * @return OptionCategory
      */
-    @GetMapping("/category")
-    public OptionCategory getOptionCategoryByName(@RequestBody String optionCategoryName) {
+    @GetMapping("category/{categoryName}")
+    public OptionCategory getOptionCategoryByName(@PathVariable("categoryName") String optionCategoryName) {
         return optionCategoryService.getOptionCategoryByName(optionCategoryName);
     }
 
