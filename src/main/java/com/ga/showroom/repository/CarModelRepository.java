@@ -11,9 +11,6 @@ import java.util.List;
 
 @Repository
 public interface CarModelRepository extends JpaRepository<CarModel, Long> {
-    OptionRepository getOptionRepository();
-    CarRepository getCarRepository();
-
     /**
      * Find a car model by its name
      * @param name String
@@ -48,12 +45,12 @@ public interface CarModelRepository extends JpaRepository<CarModel, Long> {
      * @param carModelId Long
      * @return List of Option
      */
-    List<Option> findAllOptionsByCarModelId(Long carModelId);
+    List<Option> findAllOptionsById(Long carModelId);
 
     /**
      * Find all cars of a specific car model
      * @param carModelId Long
      * @return List of Car
      */
-    List<Car> findAllCarsByCarModelId(Long carModelId);
+    List<Car> findAllCarsById(Long carModelId);
 }
