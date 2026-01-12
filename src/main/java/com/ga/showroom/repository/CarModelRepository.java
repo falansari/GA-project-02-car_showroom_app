@@ -1,5 +1,6 @@
 package com.ga.showroom.repository;
 
+import com.ga.showroom.model.Car;
 import com.ga.showroom.model.CarModel;
 import com.ga.showroom.model.Option;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,8 @@ import java.util.List;
 @Repository
 public interface CarModelRepository extends JpaRepository<CarModel, Long> {
     OptionRepository getOptionRepository();
+    CarRepository getCarRepository();
+
     /**
      * Find a car model by its name
      * @param name String
@@ -46,4 +49,11 @@ public interface CarModelRepository extends JpaRepository<CarModel, Long> {
      * @return List of Option
      */
     List<Option> findAllOptionsByCarModelId(Long carModelId);
+
+    /**
+     * Find all cars of a specific car model
+     * @param carModelId Long
+     * @return List of Car
+     */
+    List<Car> findAllCarsByCarModelId(Long carModelId);
 }

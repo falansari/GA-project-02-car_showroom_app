@@ -1,6 +1,7 @@
 package com.ga.showroom.service;
 
 import com.ga.showroom.exception.InformationNotFoundException;
+import com.ga.showroom.model.Car;
 import com.ga.showroom.model.CarModel;
 import com.ga.showroom.model.Option;
 import com.ga.showroom.repository.CarModelRepository;
@@ -83,5 +84,14 @@ public class CarModelService {
      */
     public List<Option> getAllCarModelOptions(Long carModelId) {
         return carModelRepository.findAllOptionsByCarModelId(carModelId);
+    }
+
+    /**
+     * Find all cars with of a car model
+     * @param carModelId Long
+     * @return List of Car
+     */
+    public List<Car> getAllCarsByCarModelId(Long carModelId) {
+        return carModelRepository.findAllCarsByCarModelId(carModelId);
     }
 }
