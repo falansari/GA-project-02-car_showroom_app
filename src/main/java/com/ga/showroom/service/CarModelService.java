@@ -2,6 +2,7 @@ package com.ga.showroom.service;
 
 import com.ga.showroom.exception.InformationNotFoundException;
 import com.ga.showroom.model.CarModel;
+import com.ga.showroom.model.Option;
 import com.ga.showroom.repository.CarModelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,5 +74,14 @@ public class CarModelService {
      */
     public List<CarModel> getAllByManufacturer(String manufacturer) {
         return carModelRepository.findAllByManufacturer(manufacturer);
+    }
+
+    /**
+     * Find all car options belonging to a car model
+     * @param carModelId Long
+     * @return List of Option
+     */
+    public List<Option> getAllCarModelOptions(Long carModelId) {
+        return carModelRepository.findAllOptionsByCarModelId(carModelId);
     }
 }
