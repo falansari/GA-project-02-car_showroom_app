@@ -5,8 +5,6 @@ import com.ga.showroom.model.Car;
 import com.ga.showroom.model.CarModel;
 import com.ga.showroom.model.Option;
 import com.ga.showroom.repository.CarModelRepository;
-import com.ga.showroom.repository.CarRepository;
-import com.ga.showroom.repository.OptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +13,6 @@ import java.time.Year;
 import java.util.List;
 
 @Service
-@RequestMapping(path = "api/car-models")
 public class CarModelService {
     CarModelRepository carModelRepository;
 
@@ -84,7 +81,7 @@ public class CarModelService {
      * @param carModelId Long
      * @return List of Option
      */
-    public List<Option> getAllCarModelOptions(Long carModelId) {
+    public List<Option> getAllOptionsByCarModelId(Long carModelId) {
         return carModelRepository.findAllOptionsById(carModelId);
     }
 
