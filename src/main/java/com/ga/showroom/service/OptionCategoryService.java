@@ -6,14 +6,12 @@ import com.ga.showroom.model.OptionCategory;
 import com.ga.showroom.repository.OptionCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
 import static com.ga.showroom.service.UserService.getCurrentLoggedInUser;
 
 @Service
-@RequestMapping(path = "api/option-categories")
 public class OptionCategoryService {
     OptionCategoryRepository optionCategoryRepository;
 
@@ -21,8 +19,6 @@ public class OptionCategoryService {
     public void setOptionCategoryRepository(OptionCategoryRepository optionCategoryRepository) {
         this.optionCategoryRepository = optionCategoryRepository;
     }
-
-
 
     /**
      * Get an option category by its ID
