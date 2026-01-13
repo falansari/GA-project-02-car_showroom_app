@@ -181,6 +181,10 @@ public class CarModelService {
                 // better upload location (outside classpath)
                 Path uploadPath = Paths.get("uploads/model-images");
 
+                // Delete previous image from storage
+                Path oldFilePath = uploadPath.resolve(updatedCarModel.getImage());
+                if (Files.exists(oldFilePath)) Files.delete(oldFilePath);
+
                 Files.createDirectories(uploadPath);
 
                 Files.copy(
