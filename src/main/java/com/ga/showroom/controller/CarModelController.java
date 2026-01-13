@@ -4,7 +4,6 @@ import com.ga.showroom.model.Car;
 import com.ga.showroom.model.CarModel;
 import com.ga.showroom.model.Option;
 import com.ga.showroom.service.CarModelService;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -109,8 +108,8 @@ public class CarModelController {
      * @return CarModel
      */
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public CarModel createCarModel(@RequestPart CarModel carModel, @RequestParam("image") MultipartFile image) throws BadRequestException {
-        return carModelService.createCarModel(carModel,  image);
+    public CarModel createCarModel(@RequestPart("carModel") CarModel carModel, @RequestParam("image") MultipartFile image) {
+        return carModelService.createCarModel(carModel, image);
     }
 
     /**
@@ -119,10 +118,9 @@ public class CarModelController {
      * @param carModel CarModel [name, makeYear, manufacturer, image, price]
      * @param image MultipartFile [PNG, JPEG, JPG]
      * @return CarModel
-     * @throws BadRequestException File upload exception handling
      */
     @PatchMapping(value = "/{carModelId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public CarModel updateCarModel(@PathVariable("carModelId") Long carModelId, @RequestPart CarModel carModel, @RequestParam("image") MultipartFile image) throws BadRequestException {
+    public CarModel updateCarModel(@PathVariable("carModelId") Long carModelId, @RequestPart("carModel") CarModel carModel, @RequestParam("image") MultipartFile image) {
         return carModelService.updateCarModel(carModelId, carModel,  image);
     }
 

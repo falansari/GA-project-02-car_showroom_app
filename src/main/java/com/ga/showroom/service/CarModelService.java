@@ -7,7 +7,6 @@ import com.ga.showroom.model.CarModel;
 import com.ga.showroom.model.Option;
 import com.ga.showroom.repository.CarModelRepository;
 import com.ga.showroom.utility.Uploads;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -103,11 +102,11 @@ public class CarModelService {
     /**
      * Create a new car model
      * @param carModel CarModel
-     * @param image MultipartFile [PNG, JPEG]
+     * @param image MultipartFile [PNG, JPEG, JPG]
      * @return CarModel
      */
-    public CarModel createCarModel(CarModel carModel, MultipartFile image) throws BadRequestException {
         CarModel existingCarModel = carModelRepository.findByName(carModel.getName());
+    public CarModel createCarModel(CarModel carModel, MultipartFile image) {
 
         if (existingCarModel != null) throw new InformationExistException("Car model with name " + carModel.getName() + " already exists");
 
@@ -125,9 +124,8 @@ public class CarModelService {
      * @param carModel   CarModel
      * @param image      MultipartFile [PNG, JPEG, JPG]
      * @return CarModel
-     * @throws BadRequestException Bad Request handling for file upload
      */
-    public CarModel updateCarModel(Long carModelId, CarModel carModel, MultipartFile image) throws BadRequestException {
+    public CarModel updateCarModel(Long carModelId, CarModel carModel, MultipartFile image) {
         CarModel updatedCarModel = getCarModelById(carModelId);
 
         if (updatedCarModel == null) throw new InformationNotFoundException("Car Model with ID " + carModel.getId() + " not found");

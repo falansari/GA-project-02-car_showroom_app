@@ -1,10 +1,11 @@
 package com.ga.showroom.utility;
 
-import org.apache.coyote.BadRequestException;
+import com.ga.showroom.exception.BadRequestException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
@@ -23,25 +24,25 @@ public class Uploads {
      * @return String new uploaded file's name
      * @throws BadRequestException Bad upload request handling
      */
-    public String uploadImage(String uploadPath, MultipartFile image) throws BadRequestException {
+    public String uploadImage(String uploadPath, MultipartFile image) {
 
         if (image.isEmpty()) throw new BadRequestException("Image is empty");
 
         String fileType = image.getContentType();
 
         if (!Objects.equals(fileType, "image/jpeg")
-                && !Objects.equals(fileType, "image/jpg")
                 && !Objects.equals(fileType, "image/png")) {
-            throw new BadRequestException("Invalid image file type. Only .PNG, .JPEG, AND .JPG allowed");
+            System.out.println("Uploaded file type: " + fileType);
+            throw new BadRequestException("Invalid image file type. Only .PNG and .JPEG allowed");
         }
 
         try {
             String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
             Path path = Path.of(uploadPath);
 
-            java.nio.file.Files.createDirectories(path);
+            Files.createDirectories(path);
 
-            java.nio.file.Files.copy(
+            Files.copy(
                     image.getInputStream(),
                     path.resolve(fileName),
                     StandardCopyOption.REPLACE_EXISTING
