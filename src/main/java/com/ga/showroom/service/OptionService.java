@@ -95,7 +95,7 @@ public class OptionService {
      * @param carModelId Long
      * @param optionCategoryId Long
      * @param optionId Long
-     * @Param option Option
+     * @param optionObj Option
      * @return Option
      */
     public Option updateOption(Long carModelId, Long optionCategoryId, Long optionId, Option optionObj){
@@ -106,8 +106,8 @@ public class OptionService {
 
         Option option = optionRepository.findByCarModelIdAndOptionCategoryIdAndId(carModelId, optionCategoryId, optionId)
                 .orElseThrow(() -> new InformationNotFoundException("Option " + optionId + " is not found for car model " + carModelId + " and for option category " + optionCategoryId));
-        option.setName(optionObj.getName());
-        option.setPrice(optionObj.getPrice());
+        if (optionObj.getName() != null) option.setName(optionObj.getName());
+        if (optionObj.getPrice() != null) option.setPrice(optionObj.getPrice());
 
         return optionRepository.save(option);
     }
