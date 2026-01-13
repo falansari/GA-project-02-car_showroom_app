@@ -152,4 +152,16 @@ public class CarModelService {
 
         return carModelRepository.save(updatedCarModel);
     }
+
+    /**
+     * Delete existing car model
+     * @param carModelId Long
+     */
+    public void deleteCarModel(Long carModelId) {
+        CarModel carModel = getCarModelById(carModelId);
+
+        if (carModel == null) throw new InformationNotFoundException("Car Model with ID " + carModelId + " not found");
+
+        carModelRepository.delete(carModel);
+    }
 }
