@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "api")
+@RequestMapping(path = "api/")
 public class OptionController {
     private OptionService optionService;
 
