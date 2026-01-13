@@ -31,4 +31,16 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .body(e.getMessage());
     }
+
+    /**
+     * Handle bad request exception
+     * @param e Exception
+     * @return ResponseEntity String
+     */
+    @ExceptionHandler(value = BadRequestException.class)
+    public ResponseEntity<String> handleBadRequest(Exception e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
+    }
 }

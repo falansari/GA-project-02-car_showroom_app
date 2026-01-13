@@ -1,5 +1,6 @@
 package com.ga.showroom.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +35,7 @@ public class CarModel {
     private String manufacturer;
 
     @Column
+    @JsonIgnore
     private String image;
 
     @Column
