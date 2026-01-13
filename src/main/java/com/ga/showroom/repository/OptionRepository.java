@@ -5,20 +5,34 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OptionRepository extends JpaRepository<Option, Long> {
     /**
      * Find option by its name
      * @param name String
-     * @return Option
+     * @param carModelId Long
+     * @param optionCategoryId Long
+     * @return Optional<Option>
      */
-    Option findByName(String name);
+    Optional<Option> findByNameAndCarModelIdAndOptionCategoryId(String name, Long carModelId, Long optionCategoryId);
 
     /**
-     * Find all options belonging to an option category
+     * Find option car model and option category
+     * @param carModelId Long
      * @param optionCategoryId Long
-     * @return List of Option
+     * @return List<Option>
      */
-    List<Option> findAllByOptionCategoryId(Long optionCategoryId);
+    List<Option> findByCarModelIdAndOptionCategoryId(Long carModelId, Long optionCategoryId);
+
+    /**
+     * Find option car model and option category and option id
+     * @param carModelId Long
+     * @param optionCategoryId Long
+     * @param optionId Long
+     * @return Optional<Option>
+     */
+    Optional<Option> findByCarModelIdAndOptionCategoryIdAndId(Long carModelId, Long optionCategoryId, Long optionId);
+
 }
