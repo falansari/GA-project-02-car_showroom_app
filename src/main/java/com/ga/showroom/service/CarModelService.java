@@ -6,28 +6,25 @@ import com.ga.showroom.model.Car;
 import com.ga.showroom.model.CarModel;
 import com.ga.showroom.model.Option;
 import com.ga.showroom.repository.CarModelRepository;
+import com.ga.showroom.utility.Uploads;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.Year;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 @Service
 public class CarModelService {
     CarModelRepository carModelRepository;
+    Uploads uploads;
 
     @Autowired
-    public void setCarModelRepository(CarModelRepository carModelRepository) {
+    public CarModelService(CarModelRepository carModelRepository, Uploads uploads) {
         this.carModelRepository = carModelRepository;
+        this.uploads = uploads;
     }
 
     /**
@@ -114,35 +111,9 @@ public class CarModelService {
 
         if (existingCarModel != null) throw new InformationExistException("Car model with name " + carModel.getName() + " already exists");
 
-        // handle image upload
-        if (!image.isEmpty()) {
-            String fileType = image.getContentType();
+        String uploadedImage = uploads.uploadImage("uploads/model-images", image);
 
-            if (!Objects.equals(fileType, "image/jpeg")
-                    && !Objects.equals(fileType, "image/jpg")
-                    && !Objects.equals(fileType, "image/png")) {
-                throw new BadRequestException("Invalid file type");
-            }
-            try {
-                String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
-
-                // better upload location (outside classpath)
-                Path uploadPath = Paths.get("uploads/model-images");
-                Files.createDirectories(uploadPath);
-
-                Files.copy(
-                        image.getInputStream(),
-                        uploadPath.resolve(fileName),
-                        StandardCopyOption.REPLACE_EXISTING
-                );
-
-                // save filename in DB
-                carModel.setImage(fileName);
-
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload image", e);
-            }
-        }
+        if (uploadedImage != null) carModel.setImage(uploadedImage);
 
         return carModelRepository.save(carModel);
     }
@@ -166,39 +137,12 @@ public class CarModelService {
         if (existingCarModel != null && updatedCarModel != existingCarModel)
             throw new InformationExistException("Car model with name " + carModel.getName() + " already exists");
 
-        // handle image upload
-        if (!image.isEmpty()) {
-            String fileType = image.getContentType();
+        String uploadedImage = uploads.uploadImage("uploads/model-images", image);
 
-            if (!Objects.equals(fileType, "image/jpeg")
-                    && !Objects.equals(fileType, "image/jpg")
-                    && !Objects.equals(fileType, "image/png")) {
-                throw new BadRequestException("Invalid file type");
-            }
-            try {
-                String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
+        if (uploadedImage != null) {
+            uploads.deleteImage(Paths.get("uploads/model-images", updatedCarModel.getImage()));
 
-                // better upload location (outside classpath)
-                Path uploadPath = Paths.get("uploads/model-images");
-
-                // Delete previous image from storage
-                Path oldFilePath = uploadPath.resolve(updatedCarModel.getImage());
-                if (Files.exists(oldFilePath)) Files.delete(oldFilePath);
-
-                Files.createDirectories(uploadPath);
-
-                Files.copy(
-                        image.getInputStream(),
-                        uploadPath.resolve(fileName),
-                        StandardCopyOption.REPLACE_EXISTING
-                );
-
-                // save filename in DB
-                updatedCarModel.setImage(fileName);
-
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload image", e);
-            }
+            updatedCarModel.setImage(uploadedImage);
         }
 
         if (carModel.getName() != null) updatedCarModel.setName(carModel.getName());
