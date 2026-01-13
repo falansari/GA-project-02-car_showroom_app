@@ -19,6 +19,14 @@ public interface CarModelRepository extends JpaRepository<CarModel, Long> {
     CarModel findByName(String name);
 
     /**
+     * Find a car model by its name and make year
+     * @param name String
+     * @param makeYear Year
+     * @return CarModel
+     */
+    CarModel findByNameAndMakeYear(String name, Year makeYear);
+
+    /**
      * Find all car models made in a specific year
      * @param makeYear Year
      * @return List of CarModel

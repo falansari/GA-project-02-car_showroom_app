@@ -105,10 +105,11 @@ public class CarModelService {
      * @param image MultipartFile [PNG, JPEG, JPG]
      * @return CarModel
      */
-        CarModel existingCarModel = carModelRepository.findByName(carModel.getName());
     public CarModel createCarModel(CarModel carModel, MultipartFile image) {
+        CarModel existingCarModel = carModelRepository.findByNameAndMakeYear(carModel.getName(), carModel.getMakeYear());
 
-        if (existingCarModel != null) throw new InformationExistException("Car model with name " + carModel.getName() + " already exists");
+        if (existingCarModel != null)
+            throw new InformationExistException("Car model with name " + carModel.getName() + " and year " + carModel.getMakeYear() + " already exists");
 
         String uploadedImage = uploads.uploadImage("uploads/model-images", image);
 
