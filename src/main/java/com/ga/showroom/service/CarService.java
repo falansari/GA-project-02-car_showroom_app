@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CarService {
@@ -117,5 +118,40 @@ public class CarService {
         car.setOrderLine(orderLine);
 
         return carRepository.save(car);
+    }
+
+    /**
+     * Patch update existing car's registration number, insurance policy, and/or owner.
+     * @param carId Long
+     * @param car Car
+     * @param owner User
+     * @return Car
+     */
+    public Car updateCar(Long carId, Car car, User owner) {
+        Car updatedCar = getCarById(carId);
+
+        if (updatedCar == null) throw new InformationNotFoundException("Car with ID " + carId + " not found");
+
+        if (car.getRegistrationNumber() != null) {
+            Car existing = getByRegistrationNumber(car.getRegistrationNumber());
+
+            if (!Objects.equals(existing.getId(), updatedCar.getId()))
+                throw new InformationExistException("Car with Registration Number " + existing.getRegistrationNumber() + " already exists");
+
+            updatedCar.setRegistrationNumber(car.getRegistrationNumber());
+        }
+
+        if (car.getInsurancePolicy() != null) {
+            Car existing = getByInsurancePolicy(car.getInsurancePolicy());
+
+            if (!Objects.equals(existing.getId(), updatedCar.getId()))
+                throw new InformationExistException("Car with Insurance Policy " + existing.getInsurancePolicy() + " already exists");
+
+            updatedCar.setInsurancePolicy(car.getInsurancePolicy());
+        }
+
+        if (owner != updatedCar.getOwner()) updatedCar.setOwner(owner);
+
+        return carRepository.save(updatedCar);
     }
 }
