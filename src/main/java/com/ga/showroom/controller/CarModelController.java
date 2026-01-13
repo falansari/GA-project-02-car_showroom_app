@@ -4,8 +4,11 @@ import com.ga.showroom.model.Car;
 import com.ga.showroom.model.CarModel;
 import com.ga.showroom.model.Option;
 import com.ga.showroom.service.CarModelService;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Year;
 import java.util.List;
@@ -35,7 +38,7 @@ public class CarModelController {
      * @param carModelName String
      * @return CarModel
      */
-    @GetMapping("/car-model/{carModelName}")
+    @GetMapping("/name/{carModelName}")
     public CarModel getCarModelByName(@PathVariable("carModelName") String carModelName) {
         return carModelService.getCarModelByName(carModelName);
     }
@@ -54,7 +57,7 @@ public class CarModelController {
      * @param year Year
      * @return List of CarModel
      */
-    @GetMapping("/{year}")
+    @GetMapping("/year/{year}")
     public List<CarModel> getAllCarModelsByYear(@PathVariable("year") Year year) {
         return carModelService.getAllByMakeYear(year);
     }
@@ -98,5 +101,16 @@ public class CarModelController {
     @GetMapping("/{carModelId}/cars")
     public List<Car> getAllCarsByCarModelId(@PathVariable("carModelId") long carModelId) {
         return carModelService.getAllCarsByCarModelId(carModelId);
+    }
+
+    /**
+     * Create a new car model
+     * @param carModel CarModel [name, makeYear, manufacturer, image, price]
+     * @return CarModel
+     */
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public CarModel createCarModel(@RequestPart CarModel carModel, @RequestParam("image") MultipartFile image) throws BadRequestException {
+
+        return carModelService.createCarModel(carModel,  image);
     }
 }
