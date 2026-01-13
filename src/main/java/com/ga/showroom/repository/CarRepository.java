@@ -36,4 +36,25 @@ public interface CarRepository extends JpaRepository<Car, Long> {
      * @return List of Car
      */
     List<Car> findByCarModelId(Long carModelId);
+
+    /**
+     * Find out if a car exists by registration number
+     * @param registrationNumber String
+     * @return Boolean
+     */
+    Boolean existsByRegistrationNumber(String registrationNumber);
+
+    /**
+     * Find out if a car exists by insurance policy
+     * @param insurancePolicy String
+     * @return Boolean
+     */
+    Boolean existsByInsurancePolicy(String insurancePolicy);
+
+    /**
+     * Find out if a car exists by vin number
+     * @param vinNumber String
+     * @return Boolean
+     */
+    Boolean existsByVinNumber(String vinNumber);
 }

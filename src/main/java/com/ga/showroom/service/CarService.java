@@ -1,20 +1,25 @@
 package com.ga.showroom.service;
 
+import com.ga.showroom.exception.InformationExistException;
 import com.ga.showroom.exception.InformationNotFoundException;
-import com.ga.showroom.model.Car;
+import com.ga.showroom.model.*;
 import com.ga.showroom.repository.CarRepository;
+import com.ga.showroom.utility.Uploads;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @Service
 public class CarService {
     CarRepository carRepository;
+    Uploads uploads;
 
     @Autowired
-    public CarService(CarRepository carRepository) {
+    public CarService(CarRepository carRepository,  Uploads uploads) {
         this.carRepository = carRepository;
+        this.uploads = uploads;
     }
 
     /**
@@ -78,5 +83,39 @@ public class CarService {
      */
     public List<Car> getByCarModelId(Long carModelId) {
         return carRepository.findByCarModelId(carModelId);
+    }
+
+    /**
+     * Create a new purchased vehicle.
+     * @param car Car
+     * @param customer User
+     * @param carModel CarModel
+     * @param image MultipartFile [PNG, JPEG, JPG]
+     * @param carOptions List of CarOption
+     * @param orderLine OrderLine
+     * @return Car
+     */
+    public Car createCar(Car car, User customer, CarModel carModel, MultipartFile image, List<CarOption>  carOptions, OrderLine orderLine) {
+        if (carRepository.existsByRegistrationNumber(car.getRegistrationNumber()))
+            throw new InformationExistException("Car with registration number " + car.getRegistrationNumber() + " already exists");
+
+        if (carRepository.existsByInsurancePolicy(car.getInsurancePolicy()))
+            throw new InformationExistException("Car with insurance policy " + car.getInsurancePolicy() + " already exists");
+
+        if (carRepository.existsByVinNumber(car.getVinNumber()))
+            throw new InformationExistException("Car with vin " + car.getVinNumber() + " already exists");
+
+        car.setOwner(customer);
+        car.setCarModel(carModel);
+
+        String uploadedImage = uploads.uploadImage("uploads/car-images", image);
+
+        if (uploadedImage != null) car.setImage(uploadedImage);
+
+        if (!carOptions.isEmpty()) car.setCarOptions(carOptions);
+
+        car.setOrderLine(orderLine);
+
+        return carRepository.save(car);
     }
 }
