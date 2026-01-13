@@ -14,10 +14,14 @@ import java.util.List;
 @Service
 public class CarOptionService {
     CarOptionRepository carOptionRepository;
+    CarService carService;
+    OptionService optionService;
 
     @Autowired
-    public CarOptionService(CarOptionRepository carOptionRepository) {
+    public CarOptionService(CarOptionRepository carOptionRepository,  CarService carService, OptionService optionService) {
         this.carOptionRepository = carOptionRepository;
+        this.carService = carService;
+        this.optionService = optionService;
     }
 
     /**
@@ -71,17 +75,21 @@ public class CarOptionService {
         return carOptionRepository.findAllByCarId(carId);
     }
 
-    public CarOption createCarOption(CarOption carOption) {
-        Option option = carOption.getOption();
+    public CarOption createCarOption(Long optionId, Long carId) {
+        Option option = optionService.getOptionById(optionId);
         if (option == null) throw new InformationNotFoundException("Option not found. Please provide a valid option ID");
 
-        Car car = carOption.getCar();
+        Car car = carService.getCarById(carId);
         if (car == null) throw new InformationNotFoundException("Car not found. Please provide a valid car ID");
 
-        CarOption existing = getByOptionIdAndCarId(option.getId(), car.getId());
+        CarOption existing = carOptionRepository.findByOptionIdAndCarId(optionId, carId);
         if (existing != null)
             throw new InformationExistException("Car option with option ID " + option.getId() +
-                    " and car ID " + car.getId() + "already exists");
+                    " and car ID " + car.getId() + " already exists");
+
+        CarOption carOption = new CarOption();
+        carOption.setOption(option);
+        carOption.setCar(car);
 
         return carOptionRepository.save(carOption);
     }
