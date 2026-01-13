@@ -1,7 +1,10 @@
 package com.ga.showroom.service;
 
+import com.ga.showroom.exception.InformationExistException;
 import com.ga.showroom.exception.InformationNotFoundException;
+import com.ga.showroom.model.Car;
 import com.ga.showroom.model.CarOption;
+import com.ga.showroom.model.Option;
 import com.ga.showroom.repository.CarOptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,5 +68,20 @@ public class CarOptionService {
      */
     public List<CarOption> getAllByCarId(Long carId) {
         return carOptionRepository.findAllByCarId(carId);
+    }
+
+    public CarOption createCarOption(CarOption carOption) {
+        Option option = carOption.getOption();
+        if (option == null) throw new InformationNotFoundException("Option not found. Please provide a valid option ID");
+
+        Car car = carOption.getCar();
+        if (car == null) throw new InformationNotFoundException("Car not found. Please provide a valid car ID");
+
+        CarOption existing = getByOptionIdAndCarId(option.getId(), car.getId());
+        if (existing != null)
+            throw new InformationExistException("Car option with option ID " + option.getId() +
+                    " and car ID " + car.getId() + "already exists");
+
+        return carOptionRepository.save(carOption);
     }
 }
