@@ -113,4 +113,17 @@ public class CarModelController {
 
         return carModelService.createCarModel(carModel,  image);
     }
+
+    /**
+     * Update existing car model
+     * @param carModelId Long
+     * @param carModel CarModel [name, makeYear, manufacturer, image, price]
+     * @param image MultipartFile [PNG, JPEG, JPG]
+     * @return CarModel
+     * @throws BadRequestException File upload exception handling
+     */
+    @PatchMapping(value = "/{carModelId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public CarModel updateCarModel(@PathVariable("carModelId") Long carModelId, @RequestPart CarModel carModel, @RequestParam("image") MultipartFile image) throws BadRequestException {
+        return carModelService.updateCarModel(carModelId, carModel,  image);
+    }
 }
