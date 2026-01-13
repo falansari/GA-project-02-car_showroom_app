@@ -10,11 +10,11 @@ import java.util.List;
 public interface CarOptionRepository extends JpaRepository<CarOption, Long> {
     /**
      * Find car option by its name and car it belongs to
-     * @param optionName String
+     * @param optionId Long
      * @param carId Long
      * @return CarOption
      */
-    CarOption findByOptionNameAndCarId(String optionName, Long carId);
+    CarOption findByOptionIdAndCarId(Long optionId, Long carId);
 
     /**
      * Find all car options belonging to a specific option
@@ -22,13 +22,6 @@ public interface CarOptionRepository extends JpaRepository<CarOption, Long> {
      * @return List of CarOption
      */
     List<CarOption> findAllByOptionId(Long optionId);
-
-    /**
-     * Find all options belonging to a specific option
-     * @param optionName String
-     * @return List of CarOption
-     */
-    List<CarOption> findAllByOptionName(String optionName);
 
     /**
      * Find all car options belonging to a specific car
