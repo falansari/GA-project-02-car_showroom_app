@@ -74,12 +74,13 @@ public class CarOptionController {
 
     /**
      * Create a new car option. Must be a unique option and car combination.
-     * @param carOption CarOption
+     * @param optionId Long
+     * @param carId Long
      * @see PostMapping api/car-options
      * @return CarOption
      */
     @PostMapping("")
-    public CarOption createCarOption(@RequestBody CarOption carOption) {
-        return carOptionService.createCarOption(carOption);
+    public CarOption createCarOption(@RequestParam("optionId") Long optionId, @RequestParam("carId") Long carId) {
+        return carOptionService.createCarOption(optionId, carId);
     }
 }
