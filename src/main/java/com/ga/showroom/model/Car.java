@@ -34,6 +34,7 @@ public class Car {
     private String insurancePolicy;
 
     @Column
+    @JsonIgnore
     private String image;
 
     @JsonIgnore
@@ -48,7 +49,6 @@ public class Car {
 
     @OneToOne(mappedBy = "car", fetch = FetchType.EAGER)
     private OrderLine orderLine;
-
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "car", orphanRemoval = true)
     private List<CarOption> carOptions;
