@@ -1,8 +1,6 @@
 package com.ga.showroom.controller;
 
 import com.ga.showroom.model.Option;
-import com.ga.showroom.model.OptionCategory;
-import com.ga.showroom.model.User;
 import com.ga.showroom.service.OptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -64,14 +62,14 @@ public class OptionController {
     }
 
     /**
-     * uodate one options related for specific car model and option category
+     * update one options related for specific car model and option category
      * @param carModelId Long
      * @param optionCategoryId Long
      * @param optionId Long
-     * @Param option Option
+     * @param option Option
      * @return Option
      */
-    @PutMapping(path = "car-models/{carModelId}/option-categories/{optionCategoryId}/options/{optionId}")
+    @PatchMapping(path = "car-models/{carModelId}/option-categories/{optionCategoryId}/options/{optionId}")
     public Option updateOption(@PathVariable("carModelId") Long carModelId, @PathVariable("optionCategoryId") Long optionCategoryId,
                                @PathVariable("optionId") Long optionId, @RequestBody Option option){
         return optionService.updateOption(carModelId, optionCategoryId, optionId, option);
