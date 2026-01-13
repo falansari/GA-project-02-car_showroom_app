@@ -31,6 +31,16 @@ public class OptionController {
     }
 
     /**
+     * Read option by its ID
+     * @param optionId Long
+     * @return Option
+     */
+    @GetMapping(path = "options/{optionId}")
+    public  Option getOptionById(@PathVariable("optionId") Long optionId){
+        return optionService.getOptionById(optionId);
+    }
+
+    /**
      * read one options related to specific car model and option category
      * @param carModelId Long
      * @param optionCategoryId Long

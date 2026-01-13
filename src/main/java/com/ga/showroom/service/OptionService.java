@@ -46,6 +46,16 @@ public class OptionService {
     }
 
     /**
+     * Find option by its ID
+     * @param optionId Long
+     * @return Option
+     */
+    public Option getOptionById(Long optionId) {
+        return optionRepository.findById(optionId)
+                .orElseThrow(() -> new InformationNotFoundException("Option with id " + optionId + " not found"));
+    }
+
+    /**
      * read one options related to specific car model and option category
      * @param carModelId Long
      * @param optionCategoryId Long
