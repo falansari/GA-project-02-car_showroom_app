@@ -10,11 +10,11 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     /**
-     * Find an order by its datetime.
+     * Find all orders by their datetime.
      * @param localDateTime LocalDateTime
      * @return Order
      */
-    Order findByOrderDate(LocalDateTime localDateTime);
+    List<Order> findByOrderDate(LocalDateTime localDateTime);
 
     /**
      * Find all orders belonging to a customer
