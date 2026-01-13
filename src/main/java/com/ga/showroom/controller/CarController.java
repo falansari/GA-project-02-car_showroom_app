@@ -1,9 +1,6 @@
 package com.ga.showroom.controller;
 
-import com.ga.showroom.exception.InformationNotFoundException;
 import com.ga.showroom.model.Car;
-import com.ga.showroom.model.User;
-import com.ga.showroom.repository.CarRepository;
 import com.ga.showroom.service.CarService;
 import com.ga.showroom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
