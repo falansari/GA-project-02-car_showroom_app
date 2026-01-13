@@ -110,7 +110,6 @@ public class CarModelController {
      */
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CarModel createCarModel(@RequestPart CarModel carModel, @RequestParam("image") MultipartFile image) throws BadRequestException {
-
         return carModelService.createCarModel(carModel,  image);
     }
 
@@ -125,5 +124,14 @@ public class CarModelController {
     @PatchMapping(value = "/{carModelId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CarModel updateCarModel(@PathVariable("carModelId") Long carModelId, @RequestPart CarModel carModel, @RequestParam("image") MultipartFile image) throws BadRequestException {
         return carModelService.updateCarModel(carModelId, carModel,  image);
+    }
+
+    /**
+     * Delete existing car model
+     * @param carModelId Long
+     */
+    @DeleteMapping("/{carModelId}")
+    public void deleteCarModel(@PathVariable("carModelId") Long carModelId) {
+        carModelService.deleteCarModel(carModelId);
     }
 }
