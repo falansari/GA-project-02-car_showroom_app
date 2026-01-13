@@ -146,4 +146,62 @@ public class CarModelService {
 
         return carModelRepository.save(carModel);
     }
+
+    /**
+     * Update an existing car model
+     *
+     * @param carModelId Long
+     * @param carModel   CarModel
+     * @param image      MultipartFile [PNG, JPEG, JPG]
+     * @return CarModel
+     * @throws BadRequestException Bad Request handling for file upload
+     */
+    public CarModel updateCarModel(Long carModelId, CarModel carModel, MultipartFile image) throws BadRequestException {
+        CarModel updatedCarModel = getCarModelById(carModelId);
+
+        if (updatedCarModel == null) throw new InformationNotFoundException("Car Model with ID " + carModel.getId() + " not found");
+
+        CarModel existingCarModel = carModelRepository.findByName(carModel.getName());
+
+        if (existingCarModel != null && updatedCarModel != existingCarModel)
+            throw new InformationExistException("Car model with name " + carModel.getName() + " already exists");
+
+        // handle image upload
+        if (!image.isEmpty()) {
+            String fileType = image.getContentType();
+
+            if (!Objects.equals(fileType, "image/jpeg")
+                    && !Objects.equals(fileType, "image/jpg")
+                    && !Objects.equals(fileType, "image/png")) {
+                throw new BadRequestException("Invalid file type");
+            }
+            try {
+                String fileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
+
+                // better upload location (outside classpath)
+                Path uploadPath = Paths.get("uploads/model-images");
+
+                Files.createDirectories(uploadPath);
+
+                Files.copy(
+                        image.getInputStream(),
+                        uploadPath.resolve(fileName),
+                        StandardCopyOption.REPLACE_EXISTING
+                );
+
+                // save filename in DB
+                updatedCarModel.setImage(fileName);
+
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to upload image", e);
+            }
+        }
+
+        if (carModel.getName() != null) updatedCarModel.setName(carModel.getName());
+        if (carModel.getMakeYear() != null) updatedCarModel.setMakeYear(carModel.getMakeYear());
+        if (carModel.getManufacturer() != null) updatedCarModel.setManufacturer(carModel.getManufacturer());
+        if (carModel.getPrice() != null) updatedCarModel.setPrice(carModel.getPrice());
+
+        return carModelRepository.save(updatedCarModel);
+    }
 }
