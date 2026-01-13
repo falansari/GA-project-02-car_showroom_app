@@ -39,7 +39,8 @@ public class CarOptionService {
     public CarOption getByOptionIdAndCarId(Long optionId, Long carId) {
         CarOption carOption = carOptionRepository.findByOptionIdAndCarId(optionId, carId);
 
-        if (carOption == null) throw new InformationNotFoundException("Car option with ID " + optionId + " not found");
+        if (carOption == null)
+            throw new InformationNotFoundException("Car option with Option ID " + optionId + " and Car ID " + carId + " not found");
 
         return carOption;
     }
