@@ -3,7 +3,9 @@ package com.ga.showroom.controller;
 import com.ga.showroom.model.User;
 import com.ga.showroom.model.UserProfile;
 import com.ga.showroom.model.request.ChangePasswordRequest;
+import com.ga.showroom.model.request.ForgetPasswordRequest;
 import com.ga.showroom.model.request.LoginRequest;
+import com.ga.showroom.model.request.ResetPasswordRequest;
 import com.ga.showroom.model.response.ChangePasswordResponse;
 import com.ga.showroom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +41,22 @@ public class UserController {
         System.out.println("calling changePassword ==>");
         return userService.changePassword(changePasswordRequest);
     }
-    //@PutMapping("/updateProfile")
+
     @PutMapping(path = "/updateProfile",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UserProfile updateProfile(@RequestPart UserProfile userProfile, @RequestParam("cprImage") MultipartFile cprImage) {
         System.out.println("calling updateProfile ==> ");
         return userService.updateProfile(userProfile, cprImage);
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgetPasswordRequest request) {
+        userService.forgotPassword(request.getEmailAddress());
+        return ResponseEntity.ok("If the email exists, a password reset link has been sent");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        userService.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.ok("Password reset successfully");
+    }
 }
