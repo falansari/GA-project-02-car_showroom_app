@@ -36,5 +36,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @param localDateTimeEnd LocalDateTime
      * @return List of Order
      */
-    List<Order> findByOrderDateBetween(LocalDateTime localDateTimeStart, LocalDateTime localDateTimeEnd);
+    List<Order> findByCreatedAtBetween(LocalDateTime localDateTimeStart, LocalDateTime localDateTimeEnd);
 }

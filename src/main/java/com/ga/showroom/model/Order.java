@@ -10,8 +10,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,9 +24,6 @@ public class Order {
 
     @Column
     private Double totalPrice;
-
-    @Column
-    private LocalDateTime orderDate;
 
     @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -47,6 +42,7 @@ public class Order {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "order", orphanRemoval = true)
     private List<OrderLine> orderLines;
+    //private List<OrderLine> orderLines;
 
     @CreationTimestamp
     @Column
