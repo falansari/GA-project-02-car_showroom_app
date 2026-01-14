@@ -48,7 +48,7 @@ public class Car {
     private CarModel carModel;
 
     @OneToOne(mappedBy = "car", fetch = FetchType.EAGER)
-    private OrderLine orderLine;
+    private Order order;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "car", orphanRemoval = true)
     private List<CarOption> carOptions;

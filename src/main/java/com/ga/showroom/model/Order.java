@@ -31,6 +31,11 @@ public class Order {
     private LocalDateTime orderDate;
 
     @JsonIgnore
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "car_id", referencedColumnName = "id")
+    private Car car;
+
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private User customer;

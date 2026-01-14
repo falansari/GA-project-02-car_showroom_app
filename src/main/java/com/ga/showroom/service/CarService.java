@@ -93,10 +93,10 @@ public class CarService {
      * @param carModel CarModel
      * @param image MultipartFile [PNG, JPEG, JPG]
      * @param carOptions List of CarOption
-     * @param orderLine OrderLine
+     * @param order Order
      * @return Car
      */
-    public Car createCar(Car car, User customer, CarModel carModel, MultipartFile image, List<CarOption>  carOptions, OrderLine orderLine) {
+    public Car createCar(Car car, User customer, CarModel carModel, MultipartFile image, List<CarOption> carOptions, Order order) {
         if (carRepository.existsByRegistrationNumber(car.getRegistrationNumber()))
             throw new InformationExistException("Car with registration number " + car.getRegistrationNumber() + " already exists");
 
@@ -115,7 +115,7 @@ public class CarService {
 
         if (!carOptions.isEmpty()) car.setCarOptions(carOptions);
 
-        car.setOrderLine(orderLine);
+        car.setOrder(order);
 
         return carRepository.save(car);
     }
