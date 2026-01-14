@@ -51,7 +51,7 @@ public class UserService {
                        @Lazy AuthenticationManager authenticationManager,
                        @Lazy MyUserDetails myUserDetails,
                        PasswordResetTokenRepository passwordResetTokenRepository,
-                       JavaMailSender mailSender) {
+                       @Lazy JavaMailSender mailSender) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
