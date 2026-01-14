@@ -37,19 +37,19 @@ public class Car {
     @JsonIgnore
     private String image;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "car_model_id")
     private CarModel carModel;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "car", fetch = FetchType.EAGER)
     private Order order;
 
+    @JsonIgnore
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "car", orphanRemoval = true)
     private List<CarOption> carOptions;
 

@@ -14,7 +14,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @param localDateTime LocalDateTime
      * @return Order
      */
-    List<Order> findByOrderDate(LocalDateTime localDateTime);
+    List<Order> findByCreatedAt(LocalDateTime localDateTime);
 
     /**
      * Find all orders belonging to a customer

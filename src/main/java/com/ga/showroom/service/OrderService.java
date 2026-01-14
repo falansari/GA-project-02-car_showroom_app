@@ -1,6 +1,7 @@
 package com.ga.showroom.service;
 
 import com.ga.showroom.exception.InformationNotFoundException;
+import com.ga.showroom.model.Car;
 import com.ga.showroom.model.Order;
 import com.ga.showroom.repository.OrderRepository;
 import com.ga.showroom.repository.UserRepository;
@@ -48,7 +49,7 @@ public class OrderService {
      */
     public List<Order> getByOrderDate(LocalDateTime orderDate) {
         // TODO: role management
-        return orderRepository.findByOrderDate(orderDate);
+        return orderRepository.findByCreatedAt(orderDate);
     }
 
     /**
@@ -85,6 +86,31 @@ public class OrderService {
      */
     public List<Order> getByOrderDateBetween(LocalDateTime orderDateStart, LocalDateTime orderDateEnd) {
         // TODO: role management
-        return orderRepository.findByOrderDateBetween(orderDateStart, orderDateEnd);
+        return orderRepository.findByCreatedAtBetween(orderDateStart, orderDateEnd);
+    }
+
+    /**
+     * Create a new car order
+     * @param car Car {vinNumber, registrationNumber, insurancePolicy, modelId, ownerId}
+     * @param options List of Option IDs [id, id, id, ...]
+     * @return Order
+     */
+    public Order createOrder(Car car, List<Long> options) {
+        Order order = new Order();
+
+        //TODO: Create a base car (model, owner, vin, registration, insurance)
+        //TODO: (Loop) Create car's options, as many added in the list:
+            //TODO: Check there's only 1 selection per option category. If there's repeat, throw a relevant error.
+            //TODO: Check the option exists for the chosen car model, otherwise skip with a message printout
+            //TODO: Create CarOption
+        //TODO: Generate and set car's image to car (temporarily using stock model image)
+        //TODO: Set car to order
+        //TODO: Set car's owner as order customer
+        //TODO: set logged in user as order salesman
+        //TODO: calculate total price based on car's base price + car's list of options, and set it to order
+        //TODO: update car
+        //TODO: save order
+
+        return orderRepository.save(order);
     }
 }

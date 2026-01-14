@@ -22,6 +22,7 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnore
     @Column
     private Double totalPrice;
 
@@ -30,7 +31,6 @@ public class Order {
     @JoinColumn(name = "car_id", referencedColumnName = "id")
     private Car car;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "customer_id")
     private User customer;
