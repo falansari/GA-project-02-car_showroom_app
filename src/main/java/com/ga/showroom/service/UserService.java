@@ -1,24 +1,29 @@
 package com.ga.showroom.service;
 
 import com.ga.showroom.exception.InformationExistException;
+import com.ga.showroom.model.PasswordResetToken;
 import com.ga.showroom.model.User;
 import com.ga.showroom.model.UserProfile;
 import com.ga.showroom.model.request.ChangePasswordRequest;
 import com.ga.showroom.model.request.LoginRequest;
 import com.ga.showroom.model.response.ChangePasswordResponse;
 import com.ga.showroom.model.response.LoginResponse;
+import com.ga.showroom.repository.PasswordResetTokenRepository;
 import com.ga.showroom.repository.UserRepository;
 import com.ga.showroom.security.JWTUtils;
 import com.ga.showroom.security.MyUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -26,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -35,18 +41,24 @@ public class UserService {
     private final JWTUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
     private MyUserDetails myUserDetails;
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+    private JavaMailSender mailSender;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        @Lazy PasswordEncoder passwordEncoder,
                        JWTUtils jwtUtils,
                        @Lazy AuthenticationManager authenticationManager,
-                       @Lazy MyUserDetails myUserDetails) {
+                       @Lazy MyUserDetails myUserDetails,
+                       PasswordResetTokenRepository passwordResetTokenRepository,
+                       JavaMailSender mailSender) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
         this.myUserDetails = myUserDetails;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
+        this.mailSender = mailSender;
     }
 
     public User createUser(User userObject) {
@@ -144,4 +156,56 @@ public class UserService {
         userRepository.save(user);
         return profile;
     }
+
+    @Transactional
+    public void forgotPassword(String emailAddress) {
+
+        User user = userRepository.findUserByEmailAddress(emailAddress);
+        if (user == null) {
+            return;
+        }
+
+        passwordResetTokenRepository.deleteByUser(user);
+        passwordResetTokenRepository.flush();
+
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setToken(UUID.randomUUID().toString());
+        resetToken.setUser(user);
+        resetToken.setExpiryDate(LocalDateTime.now().plusMinutes(15));
+
+        passwordResetTokenRepository.save(resetToken);
+
+        sendResetEmail(user.getEmailAddress(), resetToken.getToken());
+    }
+
+    public void resetPassword(String token, String newPassword) {
+
+        PasswordResetToken resetToken = passwordResetTokenRepository
+                .findByToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid token"));
+
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Token expired");
+        }
+
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        passwordResetTokenRepository.delete(resetToken);
+    }
+
+    private void sendResetEmail(String toEmail, String token) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+
+        // 👇 Dynamic FROM address
+        message.setFrom("no-reply@showroom.com");
+
+        message.setSubject("Password Reset Request");
+        message.setText("Reset your password using this token:\n" + token);
+
+        mailSender.send(message);
+    }
+
 }
