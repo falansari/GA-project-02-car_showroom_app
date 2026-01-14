@@ -159,7 +159,6 @@ public class UserService {
 
     @Transactional
     public void forgotPassword(String emailAddress) {
-
         User user = userRepository.findUserByEmailAddress(emailAddress);
         if (user == null) {
             return;
@@ -179,7 +178,6 @@ public class UserService {
     }
 
     public void resetPassword(String token, String newPassword) {
-
         PasswordResetToken resetToken = passwordResetTokenRepository
                 .findByToken(token)
                 .orElseThrow(() -> new RuntimeException("Invalid token"));
@@ -199,7 +197,6 @@ public class UserService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
 
-        // 👇 Dynamic FROM address
         message.setFrom("no-reply@showroom.com");
 
         message.setSubject("Password Reset Request");

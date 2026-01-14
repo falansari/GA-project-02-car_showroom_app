@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PasswordResetToken {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
