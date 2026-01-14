@@ -30,9 +30,6 @@ public class Order {
     @Column
     private LocalDateTime orderDate;
 
-    @Column
-    private Boolean isApproved;
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "customer_id")
