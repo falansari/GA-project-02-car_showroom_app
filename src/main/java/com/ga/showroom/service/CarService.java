@@ -89,14 +89,14 @@ public class CarService {
     /**
      * Create a new purchased vehicle.
      * @param car Car
-     * @param customer User
+     * @param owner User
      * @param carModel CarModel
      * @param image MultipartFile [PNG, JPEG, JPG]
      * @param carOptions List of CarOption
      * @param order Order
      * @return Car
      */
-    public Car createCar(Car car, User customer, CarModel carModel, MultipartFile image, List<CarOption> carOptions, Order order) {
+    public Car createCar(Car car, User owner, CarModel carModel, MultipartFile image, List<CarOption> carOptions, Order order) {
         if (carRepository.existsByRegistrationNumber(car.getRegistrationNumber()))
             throw new InformationExistException("Car with registration number " + car.getRegistrationNumber() + " already exists");
 
@@ -106,7 +106,7 @@ public class CarService {
         if (carRepository.existsByVinNumber(car.getVinNumber()))
             throw new InformationExistException("Car with vin " + car.getVinNumber() + " already exists");
 
-        car.setOwner(customer);
+        car.setOwner(owner);
         car.setCarModel(carModel);
 
         String uploadedImage = uploads.uploadImage("uploads/car-images", image);
