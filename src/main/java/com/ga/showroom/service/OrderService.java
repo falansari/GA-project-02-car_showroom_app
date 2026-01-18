@@ -4,12 +4,15 @@ import com.ga.showroom.exception.InformationNotFoundException;
 import com.ga.showroom.model.*;
 import com.ga.showroom.repository.OrderRepository;
 import com.ga.showroom.repository.UserRepository;
+import com.ga.showroom.utility.Uploads;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.ga.showroom.service.UserService.getCurrentLoggedInUser;
 
 @Service
 public class OrderService {
@@ -18,15 +21,24 @@ public class OrderService {
     OptionService optionService;
     CarModelService carModelService;
     CarOptionService carOptionService;
+    CarService carService;
+    Uploads uploads;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, UserRepository userRepository,
-                        OptionService optionService, CarModelService carModelService,  CarOptionService carOptionService) {
+    public OrderService(OrderRepository orderRepository,
+                        UserRepository userRepository,
+                        OptionService optionService,
+                        CarModelService carModelService,
+                        CarOptionService carOptionService,
+                        CarService carService,
+                        Uploads uploads) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.optionService = optionService;
         this.carModelService = carModelService;
         this.carOptionService = carOptionService;
+        this.carService = carService;
+        this.uploads = uploads;
     }
 
     /**
@@ -104,7 +116,6 @@ public class OrderService {
      */
     public Order createOrder(Car car, List<Long> options) {
         Order order = new Order();
-        CarModel carModel = car.getCarModel();
         List<CarOption> carOptions = new ArrayList<>();
 
         // (Loop) Create car's options, as many added in the list:
@@ -116,8 +127,8 @@ public class OrderService {
                 continue;
             }
 
-            if (!optionObj.getCarModel().equals(carModel)) { // Check the option exists for the chosen car model, otherwise skip with a message printout
-                System.out.println("Option ID " + option + " does not belong to car model " + carModel.getId() + ". Skipping.");
+            if (!optionObj.getCarModel().equals(car.getCarModel())) { // Check the option exists for the chosen car model, otherwise skip with a message printout
+                System.out.println("Option ID " + option + " does not belong to car model " + car.getCarModel().getId() + ". Skipping.");
                 continue;
             }
 
@@ -126,15 +137,16 @@ public class OrderService {
             carOptions.add(carOption);
         }
 
-        //TODO: Create a base car (model, owner, vin, registration, insurance, order)
         //TODO: Generate and set car's image to car (temporarily using stock model image)
-        //TODO: Set car to order
-        //TODO: Set car's owner as order customer
-        //TODO: set logged in user as order salesman
-        //TODO: calculate total price based on car's base price + car's list of options, and set it to order
-        //TODO: update car
-        //TODO: save order
 
+        // Create a base car (model, owner, vin, registration, insurance, order)
+        Car newCar = carService.createCar(
+                car,
+                car.getOwner(),
+                car.getCarModel(),
+                car.getCarModel().getImage(),
+                carOptions,
+                order);
         return orderRepository.save(order);
     }
 }
