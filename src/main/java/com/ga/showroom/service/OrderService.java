@@ -117,6 +117,7 @@ public class OrderService {
     public Order createOrder(Car car, List<Long> options) {
         Order order = new Order();
         List<CarOption> carOptions = new ArrayList<>();
+        Double totalPrice = car.getCarModel().getPrice();
 
         // (Loop) Create car's options, as many added in the list:
         for (Long option : options) {
@@ -135,6 +136,7 @@ public class OrderService {
             // Create CarOption
             CarOption carOption = carOptionService.createCarOption(optionObj.getId(), car.getId());
             carOptions.add(carOption);
+            totalPrice += carOption.getOption().getPrice();
         }
 
         //TODO: Generate and set car's image to car (temporarily using stock model image)
@@ -147,6 +149,15 @@ public class OrderService {
                 car.getCarModel().getImage(),
                 carOptions,
                 order);
+        // Set car to order
+        order.setCar(newCar);
+        // Set car's owner as order customer
+        order.setCustomer(newCar.getOwner());
+        // set logged-in user as order salesman
+        order.setSalesman(getCurrentLoggedInUser());
+        //calculate total price based on car's base price + car's list of options, and set it to order
+        order.setTotalPrice(totalPrice);
+
         return orderRepository.save(order);
     }
 }
