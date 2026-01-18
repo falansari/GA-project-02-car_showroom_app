@@ -13,5 +13,5 @@ public interface OrderLineRepository  extends JpaRepository<OrderLine, Long> {
      * @param orderId Long
      * @return List of OrderLine
      */
-    List<OrderLine> findAllByOrderId(Long orderId);
+    //List<OrderLine> findAllByOrderId(Long orderId);
 }
