@@ -7,6 +7,7 @@ import com.ga.showroom.repository.UserRepository;
 import com.ga.showroom.utility.Uploads;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -116,13 +117,26 @@ public class OrderService {
      * @param options List of Option IDs [id, id, id, ...]
      * @return Order
      */
+    @Transactional(rollbackFor = Exception.class)
     public Order createOrder(Car car, Long carModelId, Long ownerId, List<Long> options) {
         Order order = new Order();
+        orderRepository.save(order); // Persist it first
         List<CarOption> carOptions = new ArrayList<>();
         CarModel carModel = carModelService.getCarModelById(carModelId);
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new InformationNotFoundException("User with ID " + ownerId + " (owner ID) not found"));
         Double totalPrice = carModel.getPrice();
+
+        //TODO: Generate and set car's image to car (temporarily using stock model image)
+
+        // Create a base car (model, owner, vin, registration, insurance, order)
+        Car newCar = carService.createCar(
+                car,
+                owner,
+                carModel,
+                carModel.getImage(),
+                carOptions,
+                order);
 
         // (Loop) Create car's options, as many added in the list:
         for (Long option : options) {
@@ -144,16 +158,6 @@ public class OrderService {
             totalPrice += carOption.getOption().getPrice();
         }
 
-        //TODO: Generate and set car's image to car (temporarily using stock model image)
-
-        // Create a base car (model, owner, vin, registration, insurance, order)
-        Car newCar = carService.createCar(
-                car,
-                owner,
-                carModel,
-                carModel.getImage(),
-                carOptions,
-                order);
         // Set car to order
         order.setCar(newCar);
         // Set car's owner as order customer
