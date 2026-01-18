@@ -23,10 +23,10 @@ public class OrderLine {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
+    //@JsonIgnore
+    //@ManyToOne
+    //@JoinColumn(name = "order_id")
+    //private Order order;
 
     @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

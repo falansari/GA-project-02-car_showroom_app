@@ -38,12 +38,12 @@ public class OrderLineService {
      * @param orderId Long
      * @return List of OrderLine
      */
-    public List<OrderLine> getOrderLinesByOrderId(Long orderId) {
+    /*public List<OrderLine> getOrderLinesByOrderId(Long orderId) {
         if (!orderRepository.existsById(orderId))
             throw new  InformationNotFoundException("Order with ID " + orderId + " not found");
 
         return orderLineRepository.findAllByOrderId(orderId);
-    }
+    }*/
 
     /**
      * Create new order line belonging to an order
@@ -60,7 +60,7 @@ public class OrderLineService {
                 .orElseThrow(() -> new InformationNotFoundException("Car with ID " + carId + " not found"));
 
         OrderLine orderLine = new OrderLine();
-        orderLine.setOrder(order);
+        //orderLine.setOrder(order);
         orderLine.setCar(car);
         orderLine.setPrice(price);
 

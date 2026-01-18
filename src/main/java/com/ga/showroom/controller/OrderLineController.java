@@ -19,10 +19,10 @@ public class OrderLineController {
      * @see GetMapping api/orderlines/{orderId}
      * @return List of OrderLine
      */
-    @GetMapping("/{orderLineId}")
+    /*@GetMapping("/{orderLineId}")
     public List<OrderLine> getOrderLinesByOrderId(@PathVariable("orderLineId") Long orderLineId) {
         return  orderLineService.getOrderLinesByOrderId(orderLineId);
-    }
+    }*/
 
     /**
      * Get order line by its ID
