@@ -1,6 +1,7 @@
 package com.ga.showroom.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,12 +23,12 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column
     private Double totalPrice;
 
-    @JsonIgnore
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "car_id", referencedColumnName = "id")
     private Car car;
 
@@ -35,13 +36,12 @@ public class Order {
     @JoinColumn(name = "customer_id")
     private User customer;
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @ManyToOne
     @JoinColumn(name = "salesman_id")
     private User salesman;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "order", orphanRemoval = true)
-    private List<OrderLine> orderLines;
+    //@OneToMany(fetch = FetchType.EAGER, mappedBy = "order", orphanRemoval = true)
     //private List<OrderLine> orderLines;
 
     @CreationTimestamp

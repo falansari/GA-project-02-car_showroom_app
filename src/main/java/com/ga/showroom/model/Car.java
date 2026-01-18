@@ -1,6 +1,8 @@
 package com.ga.showroom.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,7 +36,7 @@ public class Car {
     private String insurancePolicy;
 
     @Column
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String image;
 
     @ManyToOne
@@ -43,10 +45,12 @@ public class Car {
 
     @ManyToOne
     @JoinColumn(name = "car_model_id")
+    @JsonManagedReference
     private CarModel carModel;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "car", fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "order_id")
     private Order order;
 
     @JsonIgnore
