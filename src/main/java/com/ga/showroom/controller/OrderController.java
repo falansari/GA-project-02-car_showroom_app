@@ -1,6 +1,7 @@
 package com.ga.showroom.controller;
 
 import com.ga.showroom.model.Car;
+import com.ga.showroom.model.CarModel;
 import com.ga.showroom.model.Order;
 import com.ga.showroom.model.request.CreateOrderRequest;
 import com.ga.showroom.service.OrderService;
@@ -49,8 +50,10 @@ public class OrderController {
     @PostMapping("")
     public Order createOrder(@RequestBody CreateOrderRequest request) {
             Car car = request.getCar();
+            Long modelId = request.getModelId();
+            Long ownerId = request.getOwnerId();
             List<Long> optionIds = request.getOptions();
 
-            return orderService.createOrder(car, optionIds);
+            return orderService.createOrder(car, modelId, ownerId,optionIds);
     }
 }

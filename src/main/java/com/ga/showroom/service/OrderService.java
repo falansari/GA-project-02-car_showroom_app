@@ -110,14 +110,19 @@ public class OrderService {
 
     /**
      * Create a new car order. The associated salesman is the logged-in user.
-     * @param car Car {vinNumber, registrationNumber, insurancePolicy, modelId, ownerId}
+     * @param car Car {vinNumber, registrationNumber, insurancePolicy}
+     * @param carModelId Long ID of CarModel
+     * @param ownerId Long ID of User as owner
      * @param options List of Option IDs [id, id, id, ...]
      * @return Order
      */
-    public Order createOrder(Car car, List<Long> options) {
+    public Order createOrder(Car car, Long carModelId, Long ownerId, List<Long> options) {
         Order order = new Order();
         List<CarOption> carOptions = new ArrayList<>();
-        Double totalPrice = car.getCarModel().getPrice();
+        CarModel carModel = carModelService.getCarModelById(carModelId);
+        User owner = userRepository.findById(ownerId)
+                .orElseThrow(() -> new InformationNotFoundException("User with ID " + ownerId + " (owner ID) not found"));
+        Double totalPrice = carModel.getPrice();
 
         // (Loop) Create car's options, as many added in the list:
         for (Long option : options) {
@@ -128,8 +133,8 @@ public class OrderService {
                 continue;
             }
 
-            if (!optionObj.getCarModel().equals(car.getCarModel())) { // Check the option exists for the chosen car model, otherwise skip with a message printout
-                System.out.println("Option ID " + option + " does not belong to car model " + car.getCarModel().getId() + ". Skipping.");
+            if (!optionObj.getCarModel().equals(carModel)) { // Check the option exists for the chosen car model, otherwise skip with a message printout
+                System.out.println("Option ID " + option + " does not belong to car model " + carModel.getId() + ". Skipping.");
                 continue;
             }
 
@@ -144,9 +149,9 @@ public class OrderService {
         // Create a base car (model, owner, vin, registration, insurance, order)
         Car newCar = carService.createCar(
                 car,
-                car.getOwner(),
-                car.getCarModel(),
-                car.getCarModel().getImage(),
+                owner,
+                carModel,
+                carModel.getImage(),
                 carOptions,
                 order);
         // Set car to order

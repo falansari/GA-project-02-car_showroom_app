@@ -10,5 +10,7 @@ import java.util.List;
 @Setter
 public class CreateOrderRequest {
     private Car car;
+    private Long modelId;
+    private Long ownerId;
     private List<Long> options;
 }
