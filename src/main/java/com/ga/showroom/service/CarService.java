@@ -1,16 +1,19 @@
 package com.ga.showroom.service;
 
+import com.ga.showroom.exception.AccessDeniedException;
 import com.ga.showroom.exception.InformationExistException;
 import com.ga.showroom.exception.InformationNotFoundException;
 import com.ga.showroom.model.*;
+import com.ga.showroom.model.enums.Role;
 import com.ga.showroom.repository.CarRepository;
 import com.ga.showroom.utility.Uploads;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Objects;
+
+import static com.ga.showroom.service.UserService.getCurrentLoggedInUser;
 
 @Service
 public class CarService {
@@ -29,8 +32,15 @@ public class CarService {
      * @return Car
      */
     public Car getCarById(Long carId) {
-        return carRepository.findById(carId)
+        Car car = carRepository.findById(carId)
                 .orElseThrow(() -> new InformationNotFoundException("Car with ID " + carId + " not found"));
+
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER) // not owner customer not allowed to view data
+                && !car.getOwner().getId().equals(getCurrentLoggedInUser().getId()))
+            throw new AccessDeniedException("You are not authorized to view this vehicle's information. " +
+                    "Please contact a salesman or the vehicle's owner.");
+
+        return car;
     }
 
     /**
@@ -42,6 +52,12 @@ public class CarService {
         Car car = carRepository.findByRegistrationNumber(registrationNumber);
 
         if (car == null) throw new InformationNotFoundException("Car with registration number " + registrationNumber + " not found");
+
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER) // not owner customer not allowed to view data
+                && !car.getOwner().getId().equals(getCurrentLoggedInUser().getId()))
+            throw new AccessDeniedException("You are not authorized to view this vehicle's information. " +
+                    "Please contact a salesman or the vehicle's owner.");
+
         return car;
     }
 
@@ -54,6 +70,12 @@ public class CarService {
         Car car = carRepository.findByInsurancePolicy(insurancePolicy);
 
         if (car == null) throw new InformationNotFoundException("Car with insurance policy " + insurancePolicy + " not found");
+
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER) // not owner customer not allowed to view data
+                && !car.getOwner().getId().equals(getCurrentLoggedInUser().getId()))
+            throw new AccessDeniedException("You are not authorized to view this vehicle's information. " +
+                    "Please contact a salesman or the vehicle's owner.");
+
         return car;
     }
 
@@ -66,6 +88,12 @@ public class CarService {
         Car car = carRepository.findByVinNumber(vinNumber);
 
         if (car == null) throw new InformationNotFoundException("Car with vin " + vinNumber + " not found");
+
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER) // not owner customer not allowed to view data
+                && !car.getOwner().getId().equals(getCurrentLoggedInUser().getId()))
+            throw new AccessDeniedException("You are not authorized to view this vehicle's information. " +
+                    "Please contact a salesman or the vehicle's owner.");
+
         return car;
     }
 
@@ -74,6 +102,9 @@ public class CarService {
      * @return List of Car
      */
     public List<Car> getAllCars() {
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)) // Customer views own data only
+            return carRepository.findAllByOwnerId(getCurrentLoggedInUser().getId());
+
         return carRepository.findAll();
     }
 
@@ -83,6 +114,9 @@ public class CarService {
      * @return List of Car
      */
     public List<Car> getByCarModelId(Long carModelId) {
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)) // Customer views own data only
+            return carRepository.findAllByCarModelIdAndOwnerId(carModelId, getCurrentLoggedInUser().getId());
+
         return carRepository.findByCarModelId(carModelId);
     }
 
@@ -97,6 +131,9 @@ public class CarService {
      * @return Car
      */
     public Car createCar(Car car, User owner, CarModel carModel, String image, List<CarOption> carOptions, Order order) {
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)) // Only a salesman or admin may create new orders that contain new car data
+            throw new AccessDeniedException("You are not authorized to create new cars. Please contact a salesman or admin.");
+
         if (carRepository.existsByRegistrationNumber(car.getRegistrationNumber()))
             throw new InformationExistException("Car with registration number " + car.getRegistrationNumber() + " already exists");
 
@@ -127,6 +164,9 @@ public class CarService {
      * @return Car
      */
     public Car updateCar(Long carId, Car car, User owner) {
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)) // Only a salesman or admin may create new orders that contain new car data
+            throw new AccessDeniedException("You are not authorized to update car details. Please contact a salesman or admin.");
+
         Car updatedCar = getCarById(carId);
 
         if (updatedCar == null) throw new InformationNotFoundException("Car with ID " + carId + " not found");
