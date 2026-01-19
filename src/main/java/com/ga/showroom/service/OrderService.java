@@ -1,7 +1,9 @@
 package com.ga.showroom.service;
 
+import com.ga.showroom.exception.AccessDeniedException;
 import com.ga.showroom.exception.InformationNotFoundException;
 import com.ga.showroom.model.*;
+import com.ga.showroom.model.enums.Role;
 import com.ga.showroom.repository.OrderRepository;
 import com.ga.showroom.repository.UserRepository;
 import com.ga.showroom.utility.Uploads;
@@ -48,9 +50,15 @@ public class OrderService {
      * @return Order
      */
     public Order getById(Long orderId) {
-        // TODO: role management
-        return orderRepository.findById(orderId)
+        Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new InformationNotFoundException("Order " + orderId + " not found"));
+
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER) // not owner customer not allowed to view data
+                && !order.getCustomer().getId().equals(getCurrentLoggedInUser().getId()))
+            throw new AccessDeniedException("You are not authorized to view this order's information. " +
+                    "Please contact a salesman or the order's customer.");
+
+        return order;
     }
 
     /**
@@ -58,7 +66,9 @@ public class OrderService {
      * @return List of Order
      */
     public List<Order> getAll() {
-        // TODO: role management
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)) // Customer views own data only
+            return orderRepository.findAllByCustomerId(getCurrentLoggedInUser().getId());
+
         return orderRepository.findAll();
     }
 
@@ -68,8 +78,10 @@ public class OrderService {
      * @return List of Order
      */
     public List<Order> getByOrderDate(LocalDateTime orderDate) {
-        // TODO: role management
-        return orderRepository.findByCreatedAt(orderDate);
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)) // Customer views own data only
+            return orderRepository.findAllByCreatedAtAndCustomerId(orderDate, getCurrentLoggedInUser().getId());
+
+        return orderRepository.findAllByCreatedAt(orderDate);
     }
 
     /**
@@ -78,9 +90,13 @@ public class OrderService {
      * @return List of Order
      */
     public List<Order> getByCustomerId(Long customerId) {
-        // TODO: role management
         if (!userRepository.existsById(customerId))
             throw new InformationNotFoundException("Customer with ID " + customerId + " not found");
+
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER) // not owner customer not allowed to view data
+                && !customerId.equals(getCurrentLoggedInUser().getId()))
+            throw new AccessDeniedException("You are not authorized to view this customer's order history. " +
+                    "Please contact a salesman or the customer.");
 
         return orderRepository.findAllByCustomerId(customerId);
     }
@@ -91,7 +107,9 @@ public class OrderService {
      * @return List of Order
      */
     public List<Order> getBySalesmanId(Long salesmanId) {
-        // TODO: role management
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)) // customer not allowed to view data
+           throw new AccessDeniedException("You are not authorized to view this data. Please contact a salesman or admin.");
+
         if (!userRepository.existsById(salesmanId))
             throw new InformationNotFoundException("salesman with ID " + salesmanId + " not found");
 
@@ -105,8 +123,10 @@ public class OrderService {
      * @return List of Order
      */
     public List<Order> getByOrderDateBetween(LocalDateTime orderDateStart, LocalDateTime orderDateEnd) {
-        // TODO: role management
-        return orderRepository.findByCreatedAtBetween(orderDateStart, orderDateEnd);
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)) // Customer views own data only
+            return orderRepository.findAllByCreatedAtBetweenAndCustomerId(orderDateStart, orderDateEnd, getCurrentLoggedInUser().getId());
+
+        return orderRepository.findAllByCreatedAtBetween(orderDateStart, orderDateEnd);
     }
 
     /**
@@ -119,6 +139,9 @@ public class OrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Order createOrder(Car car, Long carModelId, Long ownerId, List<Long> options) {
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)) // customer not allowed to view data
+            throw new AccessDeniedException("You are not authorized to create new orders. Please contact a salesman or admin.");
+
         Order order = new Order();
         orderRepository.save(order); // Persist it first
         List<CarOption> carOptions = new ArrayList<>();
