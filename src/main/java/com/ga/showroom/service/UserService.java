@@ -67,7 +67,7 @@ public class UserService {
             userObject.setPassword(passwordEncoder.encode(userObject.getPassword()));
             return userRepository.save(userObject);
         } else {
-            throw new InformationExistException("User with email address " + userObject.getUserName() + " already exists.");
+            throw new InformationExistException("User with email address " + userObject.getEmailAddress() + " already exists.");
         }
     }
 
@@ -114,7 +114,7 @@ public class UserService {
         } else {
             user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
              userRepository.save(user);
-             return new ChangePasswordResponse("Password for " + user.getUserName() + " has been changed successfully!");
+             return new ChangePasswordResponse("Password for " + user.getEmailAddress() + " has been changed successfully!");
         }
     }
 
@@ -125,7 +125,6 @@ public class UserService {
 
         profile.setFirstName(userProfile.getFirstName());
         profile.setLastName(userProfile.getLastName());
-        profile.setEmailAddress(userProfile.getEmailAddress());
         profile.setPhoneNumber(userProfile.getPhoneNumber());
         profile.setHomeAddress(userProfile.getHomeAddress());
         profile.setCpr(userProfile.getCpr());
