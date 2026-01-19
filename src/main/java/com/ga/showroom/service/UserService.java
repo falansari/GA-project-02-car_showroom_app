@@ -107,7 +107,7 @@ public class UserService {
             // Check if the user is verified
             if (!myUserDetails.getUser().getVerified()) { // assuming 'enabled' = email verified
                 return ResponseEntity
-                        .status(HttpStatus.FORBIDDEN)
+                        .status(HttpStatus.FORBIDDEN) // TODO: use the new AccessDeniedException
                         .body("Error: Email not verified. Please verify your email before logging in.");
             }
 
