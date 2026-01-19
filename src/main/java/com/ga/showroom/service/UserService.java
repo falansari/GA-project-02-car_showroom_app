@@ -72,7 +72,7 @@ public class UserService {
         if(!userRepository.existsByEmailAddress(userObject.getEmailAddress())){
             userObject.setPassword(passwordEncoder.encode(userObject.getPassword()));
 
-            userObject.setEnabled(false);
+            userObject.setVerified(false);
             User savedUser = userRepository.save(userObject);
 
             EmailVerificationToken token = new EmailVerificationToken();
@@ -105,7 +105,7 @@ public class UserService {
             System.out.println("myUserDetails :::: "+myUserDetails.getUsername());
 
             // Check if the user is verified
-            if (!myUserDetails.getUser().getEnabled()) { // assuming 'enabled' = email verified
+            if (!myUserDetails.getUser().getVerified()) { // assuming 'enabled' = email verified
                 return ResponseEntity
                         .status(HttpStatus.FORBIDDEN)
                         .body("Error: Email not verified. Please verify your email before logging in.");
@@ -251,7 +251,7 @@ public class UserService {
         }
 
         User user = verificationToken.getUser();
-        user.setEnabled(true);
+        user.setVerified(true);
 
         userRepository.save(user);
         emailVerificationTokenRepository.delete(verificationToken);

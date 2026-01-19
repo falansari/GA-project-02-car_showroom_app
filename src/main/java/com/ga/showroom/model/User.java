@@ -33,7 +33,7 @@ public class User {
     private String role;
 
     @Column
-    private Boolean enabled;
+    private Boolean verified;
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", orphanRemoval = true)
