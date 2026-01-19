@@ -1,6 +1,9 @@
 package com.ga.showroom.controller;
 
+import com.ga.showroom.model.Car;
+import com.ga.showroom.model.CarModel;
 import com.ga.showroom.model.Order;
+import com.ga.showroom.model.request.CreateOrderRequest;
 import com.ga.showroom.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -42,5 +45,15 @@ public class OrderController {
     @GetMapping("/between")
     public List<Order> getOrdersByOrderDateBetween(@RequestParam("startDate") LocalDateTime startDate, @RequestParam("endDate") LocalDateTime endDate) {
         return orderService.getByOrderDateBetween(startDate, endDate);
+    }
+
+    @PostMapping("")
+    public Order createOrder(@RequestBody CreateOrderRequest request) {
+            Car car = request.getCar();
+            Long modelId = request.getModelId();
+            Long ownerId = request.getOwnerId();
+            List<Long> optionIds = request.getOptions();
+
+            return orderService.createOrder(car, modelId, ownerId,optionIds);
     }
 }

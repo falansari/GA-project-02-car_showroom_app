@@ -35,13 +35,16 @@ public class User {
     @Column
     private Boolean enabled;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "customer", orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", orphanRemoval = true)
     private List<Order> ordersRequested;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "salesman", orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "salesman", orphanRemoval = true)
     private List<Order> ordersMonitored;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "owner", orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner", orphanRemoval = true)
     private List<Car> cars;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

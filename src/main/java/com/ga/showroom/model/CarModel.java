@@ -1,5 +1,6 @@
 package com.ga.showroom.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -41,10 +42,11 @@ public class CarModel {
     @Column
     private Double price;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "carModel", orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "carModel", orphanRemoval = true)
+    @JsonBackReference
     private List<Car> cars;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "carModel", orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "carModel", orphanRemoval = true)
     private List<Option> options;
 
     @CreationTimestamp

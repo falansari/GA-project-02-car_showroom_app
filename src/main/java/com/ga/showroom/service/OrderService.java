@@ -1,24 +1,45 @@
 package com.ga.showroom.service;
 
 import com.ga.showroom.exception.InformationNotFoundException;
-import com.ga.showroom.model.Order;
+import com.ga.showroom.model.*;
 import com.ga.showroom.repository.OrderRepository;
 import com.ga.showroom.repository.UserRepository;
+import com.ga.showroom.utility.Uploads;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.ga.showroom.service.UserService.getCurrentLoggedInUser;
 
 @Service
 public class OrderService {
     OrderRepository orderRepository;
     UserRepository userRepository;
+    OptionService optionService;
+    CarModelService carModelService;
+    CarOptionService carOptionService;
+    CarService carService;
+    Uploads uploads;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, UserRepository userRepository) {
+    public OrderService(OrderRepository orderRepository,
+                        UserRepository userRepository,
+                        OptionService optionService,
+                        CarModelService carModelService,
+                        CarOptionService carOptionService,
+                        CarService carService,
+                        Uploads uploads) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
+        this.optionService = optionService;
+        this.carModelService = carModelService;
+        this.carOptionService = carOptionService;
+        this.carService = carService;
+        this.uploads = uploads;
     }
 
     /**
@@ -48,7 +69,7 @@ public class OrderService {
      */
     public List<Order> getByOrderDate(LocalDateTime orderDate) {
         // TODO: role management
-        return orderRepository.findByOrderDate(orderDate);
+        return orderRepository.findByCreatedAt(orderDate);
     }
 
     /**
@@ -85,6 +106,67 @@ public class OrderService {
      */
     public List<Order> getByOrderDateBetween(LocalDateTime orderDateStart, LocalDateTime orderDateEnd) {
         // TODO: role management
-        return orderRepository.findByOrderDateBetween(orderDateStart, orderDateEnd);
+        return orderRepository.findByCreatedAtBetween(orderDateStart, orderDateEnd);
+    }
+
+    /**
+     * Create a new car order. The associated salesman is the logged-in user.
+     * @param car Car {vinNumber, registrationNumber, insurancePolicy}
+     * @param carModelId Long ID of CarModel
+     * @param ownerId Long ID of User as owner
+     * @param options List of Option IDs [id, id, id, ...]
+     * @return Order
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Order createOrder(Car car, Long carModelId, Long ownerId, List<Long> options) {
+        Order order = new Order();
+        orderRepository.save(order); // Persist it first
+        List<CarOption> carOptions = new ArrayList<>();
+        CarModel carModel = carModelService.getCarModelById(carModelId);
+        User owner = userRepository.findById(ownerId)
+                .orElseThrow(() -> new InformationNotFoundException("User with ID " + ownerId + " (owner ID) not found"));
+        Double totalPrice = carModel.getPrice();
+
+        //TODO: Generate and set car's image to car (temporarily using stock model image)
+
+        // Create a base car (model, owner, vin, registration, insurance, order)
+        Car newCar = carService.createCar(
+                car,
+                owner,
+                carModel,
+                carModel.getImage(),
+                carOptions,
+                order);
+
+        // (Loop) Create car's options, as many added in the list:
+        for (Long option : options) {
+            Option optionObj = optionService.getOptionById(option);
+
+            if (optionObj == null) {
+                System.out.println("No option found with ID " + option + ". Skipping.");
+                continue;
+            }
+
+            if (!optionObj.getCarModel().equals(carModel)) { // Check the option exists for the chosen car model, otherwise skip with a message printout
+                System.out.println("Option ID " + option + " does not belong to car model " + carModel.getId() + ". Skipping.");
+                continue;
+            }
+
+            // Create CarOption
+            CarOption carOption = carOptionService.createCarOption(optionObj.getId(), car.getId());
+            carOptions.add(carOption);
+            totalPrice += carOption.getOption().getPrice();
+        }
+
+        // Set car to order
+        order.setCar(newCar);
+        // Set car's owner as order customer
+        order.setCustomer(newCar.getOwner());
+        // set logged-in user as order salesman
+        order.setSalesman(getCurrentLoggedInUser());
+        //calculate total price based on car's base price + car's list of options, and set it to order
+        order.setTotalPrice(totalPrice);
+
+        return orderRepository.save(order);
     }
 }
