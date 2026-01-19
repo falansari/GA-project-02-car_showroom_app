@@ -2,10 +2,7 @@ package com.ga.showroom.controller;
 
 import com.ga.showroom.model.User;
 import com.ga.showroom.model.UserProfile;
-import com.ga.showroom.model.request.ChangePasswordRequest;
-import com.ga.showroom.model.request.ForgetPasswordRequest;
-import com.ga.showroom.model.request.LoginRequest;
-import com.ga.showroom.model.request.ResetPasswordRequest;
+import com.ga.showroom.model.request.*;
 import com.ga.showroom.model.response.ChangePasswordResponse;
 import com.ga.showroom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,5 +55,11 @@ public class UserController {
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         userService.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok("Password reset successfully");
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyEmail(@RequestBody VerifyEmailRequest request) {
+        userService.verifyEmail(request.getToken());
+        return ResponseEntity.ok("Email has been verified successfully!");
     }
 }

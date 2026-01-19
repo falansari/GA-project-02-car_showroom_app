@@ -1,6 +1,7 @@
 package com.ga.showroom.service;
 
 import com.ga.showroom.exception.InformationExistException;
+import com.ga.showroom.model.EmailVerificationToken;
 import com.ga.showroom.model.PasswordResetToken;
 import com.ga.showroom.model.User;
 import com.ga.showroom.model.UserProfile;
@@ -8,12 +9,14 @@ import com.ga.showroom.model.request.ChangePasswordRequest;
 import com.ga.showroom.model.request.LoginRequest;
 import com.ga.showroom.model.response.ChangePasswordResponse;
 import com.ga.showroom.model.response.LoginResponse;
+import com.ga.showroom.repository.EmailVerificationTokenRepository;
 import com.ga.showroom.repository.PasswordResetTokenRepository;
 import com.ga.showroom.repository.UserRepository;
 import com.ga.showroom.security.JWTUtils;
 import com.ga.showroom.security.MyUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -43,6 +46,7 @@ public class UserService {
     private MyUserDetails myUserDetails;
     private PasswordResetTokenRepository passwordResetTokenRepository;
     private JavaMailSender mailSender;
+    private EmailVerificationTokenRepository emailVerificationTokenRepository;
 
     @Autowired
     public UserService(UserRepository userRepository,
@@ -51,7 +55,8 @@ public class UserService {
                        @Lazy AuthenticationManager authenticationManager,
                        @Lazy MyUserDetails myUserDetails,
                        PasswordResetTokenRepository passwordResetTokenRepository,
-                       @Lazy JavaMailSender mailSender) {
+                       @Lazy JavaMailSender mailSender,
+                       EmailVerificationTokenRepository emailVerificationTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
@@ -59,13 +64,26 @@ public class UserService {
         this.myUserDetails = myUserDetails;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.mailSender = mailSender;
+        this.emailVerificationTokenRepository = emailVerificationTokenRepository;
     }
 
     public User createUser(User userObject) {
         System.out.println("service calling createUser ==> ");
         if(!userRepository.existsByEmailAddress(userObject.getEmailAddress())){
             userObject.setPassword(passwordEncoder.encode(userObject.getPassword()));
-            return userRepository.save(userObject);
+
+            userObject.setVerified(false);
+            User savedUser = userRepository.save(userObject);
+
+            EmailVerificationToken token = new EmailVerificationToken();
+            token.setToken(UUID.randomUUID().toString());
+            token.setUser(savedUser);
+            token.setExpiryDate(LocalDateTime.now().plusMinutes(15));
+
+            emailVerificationTokenRepository.save(token);
+            sendVerificationEmail(userObject.getEmailAddress(), token.getToken());
+
+            return savedUser;
         } else {
             throw new InformationExistException("User with email address " + userObject.getUserName() + " already exists.");
         }
@@ -82,20 +100,26 @@ public class UserService {
                     .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmailAddress(), loginRequest.getPassword()));
             System.out.println("authentication :: "+authentication);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
             myUserDetails = (MyUserDetails) authentication.getPrincipal();
             System.out.println("myUserDetails :::: "+myUserDetails.getUsername());
+
+            // Check if the user is verified
+            if (!myUserDetails.getUser().getVerified()) { // assuming 'enabled' = email verified
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN) // TODO: use the new AccessDeniedException
+                        .body("Error: Email not verified. Please verify your email before logging in.");
+            }
+
             final String JWT = jwtUtils.generateJwtToken(myUserDetails);
             System.out.println("jwtt"+JWT);
+
             return ResponseEntity.ok(new LoginResponse(JWT));
         } catch (Exception e) {
             return ResponseEntity.ok(new LoginResponse("Error : user name or password is incorrect"));
         }
     }
 
-    /**
-     * Get current logged in user
-     * @return
-     */
     public static User getCurrentLoggedInUser() {
         MyUserDetails userDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         assert userDetails != null;
@@ -203,6 +227,34 @@ public class UserService {
         message.setText("Reset your password using this token:\n" + token);
 
         mailSender.send(message);
+    }
+
+    private void sendVerificationEmail(String toEmail, String token) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+
+        message.setFrom("no-reply@showroom.com");
+
+        message.setSubject("Verify Email Request");
+        message.setText("Verify your email using this token:\n" + token);
+
+        mailSender.send(message);
+    }
+
+    public void verifyEmail(String token) {
+        EmailVerificationToken verificationToken = emailVerificationTokenRepository
+                        .findByToken(token)
+                        .orElseThrow(() -> new RuntimeException("Invalid verification token"));
+
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Verification token expired");
+        }
+
+        User user = verificationToken.getUser();
+        user.setVerified(true);
+
+        userRepository.save(user);
+        emailVerificationTokenRepository.delete(verificationToken);
     }
 
 }
