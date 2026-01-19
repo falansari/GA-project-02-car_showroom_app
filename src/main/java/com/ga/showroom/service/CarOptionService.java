@@ -1,15 +1,19 @@
 package com.ga.showroom.service;
 
+import com.ga.showroom.exception.AccessDeniedException;
 import com.ga.showroom.exception.InformationExistException;
 import com.ga.showroom.exception.InformationNotFoundException;
 import com.ga.showroom.model.Car;
 import com.ga.showroom.model.CarOption;
 import com.ga.showroom.model.Option;
+import com.ga.showroom.model.enums.Role;
 import com.ga.showroom.repository.CarOptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.ga.showroom.service.UserService.getCurrentLoggedInUser;
 
 @Service
 public class CarOptionService {
@@ -30,8 +34,15 @@ public class CarOptionService {
      * @return CarOption
      */
     public CarOption getById(Long carOptionId) {
-        return carOptionRepository.findById(carOptionId)
+        CarOption carOption = carOptionRepository.findById(carOptionId)
                 .orElseThrow(() -> new InformationNotFoundException("Car option with ID " + carOptionId + " not found"));
+
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER) // not owner customer not allowed to view data
+                && !carOption.getCar().getOwner().getId().equals(getCurrentLoggedInUser().getId()))
+            throw new AccessDeniedException("You are not authorized to view this vehicle's information. " +
+                    "Please contact a salesman or the vehicle's owner.");
+
+        return carOption;
     }
 
     /**
@@ -46,6 +57,11 @@ public class CarOptionService {
         if (carOption == null)
             throw new InformationNotFoundException("Car option with Option ID " + optionId + " and Car ID " + carId + " not found");
 
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER) // not owner customer not allowed to view data
+                && !carOption.getCar().getOwner().getId().equals(getCurrentLoggedInUser().getId()))
+            throw new AccessDeniedException("You are not authorized to view this vehicle's information. " +
+                    "Please contact a salesman or the vehicle's owner.");
+
         return carOption;
     }
 
@@ -54,6 +70,9 @@ public class CarOptionService {
      * @return List of CarOption
      */
     public List<CarOption> getAll() {
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)) // Customer views their own data only
+            return carOptionRepository.findAllByCarOwnerId(getCurrentLoggedInUser().getId());
+
         return carOptionRepository.findAll();
     }
 
@@ -63,6 +82,9 @@ public class CarOptionService {
      * @return List of CarOption
      */
     public List<CarOption> getAllByOptionId(Long optionId) {
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)) // Customer views their own data only
+            return carOptionRepository.findAllByOptionIdAndCarOwnerId(optionId, getCurrentLoggedInUser().getId());
+
         return carOptionRepository.findAllByOptionId(optionId);
     }
 
@@ -72,10 +94,26 @@ public class CarOptionService {
      * @return List of CarOption
      */
     public List<CarOption> getAllByCarId(Long carId) {
+        Car car = carService.getCarById(carId);
+
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER) // not owner customer not allowed to view data
+                && !car.getOwner().getId().equals(getCurrentLoggedInUser().getId()))
+            throw new AccessDeniedException("You are not authorized to view this vehicle's information. " +
+                    "Please contact a salesman or the vehicle's owner.");
+
         return carOptionRepository.findAllByCarId(carId);
     }
 
+    /**
+     * Add an option to a car
+     * @param optionId Long
+     * @param carId Long
+     * @return CarOption
+     */
     public CarOption createCarOption(Long optionId, Long carId) {
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)) // Only a salesman or admin may create new orders that contain new car data
+            throw new AccessDeniedException("You are not authorized to create new car options. Please contact a salesman or admin.");
+
         Option option = optionService.getOptionById(optionId);
         if (option == null) throw new InformationNotFoundException("Option not found. Please provide a valid option ID");
 

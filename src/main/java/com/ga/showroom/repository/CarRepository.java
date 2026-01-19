@@ -38,6 +38,21 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     List<Car> findByCarModelId(Long carModelId);
 
     /**
+     * Find all vehicles belonging to a specific owner
+     * @param ownerId Long
+     * @return List of Car
+     */
+    List<Car> findAllByOwnerId(Long ownerId);
+
+    /**
+     * Find all cars of a specific model belonging to a specific owner
+     * @param carModelId Long
+     * @param ownerId Long
+     * @return List of Car
+     */
+    List<Car> findAllByCarModelIdAndOwnerId(Long carModelId, Long ownerId);
+
+    /**
      * Find out if a car exists by registration number
      * @param registrationNumber String
      * @return Boolean

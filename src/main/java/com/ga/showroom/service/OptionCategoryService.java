@@ -1,8 +1,10 @@
 package com.ga.showroom.service;
 
+import com.ga.showroom.exception.AccessDeniedException;
 import com.ga.showroom.exception.InformationExistException;
 import com.ga.showroom.exception.InformationNotFoundException;
 import com.ga.showroom.model.OptionCategory;
+import com.ga.showroom.model.enums.Role;
 import com.ga.showroom.repository.OptionCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,20 +53,19 @@ public class OptionCategoryService {
     }
 
     /**
-     * Create a new option category. Only admin allowed.
+     * Create a new option category.
      * @param optionCategory OptionCategory
      * @return OptionCategory
      */
     public OptionCategory createOptionCategory(OptionCategory optionCategory) {
-        System.out.println("User role: " + getCurrentLoggedInUser().getRole());
-        // TODO: admin only should be able to create a option category. add with role management issue.
-        /*if (!Objects.equals(getCurrentLoggedInUser().getRole(), "admin")) {
-            throw new AccessDeniedException("Only an admin can access OptionCategory");
-        }*/
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER))
+            throw new AccessDeniedException("You are not allowed to create an Option Category. " +
+                    "Please contact a salesman or admin.");
 
         OptionCategory existingOptionCategory = optionCategoryRepository.findByName(optionCategory.getName());
 
-        if (existingOptionCategory != null) throw new InformationExistException("Option Category with name " + optionCategory.getName()+ " already exists");
+        if (existingOptionCategory != null)
+            throw new InformationExistException("Option Category with name " + optionCategory.getName()+ " already exists");
 
         return optionCategoryRepository.save(optionCategory);
     }
@@ -76,10 +77,9 @@ public class OptionCategoryService {
      * @return OptionCategory
      */
     public OptionCategory updateOptionCategory(Long optionCategoryId, OptionCategory optionCategory) {
-        // TODO: admin only should be able to create a option category. add with role management issue.
-        /*if (!Objects.equals(getCurrentLoggedInUser().getRole(), "admin")) {
-            throw new AccessDeniedException("Only an admin can access OptionCategory");
-        }*/
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER))
+            throw new AccessDeniedException("You are not allowed to update an Option Category. " +
+                    "Please contact a salesman or admin.");
 
         OptionCategory storedOptionCategory = getOptionCategoryById(optionCategoryId);
 
@@ -101,10 +101,9 @@ public class OptionCategoryService {
      * @param optionCategoryId Long
      */
     public void deleteOptionCategory(Long optionCategoryId) {
-        // TODO: admin only should be able to create a option category. add with role management issue.
-        /*if (!Objects.equals(getCurrentLoggedInUser().getRole(), "admin")) {
-            throw new AccessDeniedException("Only an admin can access OptionCategory");
-        }*/
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER))
+            throw new AccessDeniedException("You are not allowed to delete an Option Category. " +
+                    "Please contact a salesman or admin.");
 
         OptionCategory storedOptionCategory = getOptionCategoryById(optionCategoryId);
 

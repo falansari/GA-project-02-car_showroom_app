@@ -43,4 +43,16 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());
     }
+
+    /**
+     * Handle access denied  exception
+     * @param e Exception
+     * @return ResponseEntity String
+     */
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public ResponseEntity<String> handleAccessDenied(Exception e) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(e.getMessage());
+    }
 }

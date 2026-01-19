@@ -14,7 +14,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @param localDateTime LocalDateTime
      * @return Order
      */
-    List<Order> findByCreatedAt(LocalDateTime localDateTime);
+    List<Order> findAllByCreatedAt(LocalDateTime localDateTime);
 
     /**
      * Find all orders belonging to a customer
@@ -22,6 +22,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @return List of Order
      */
     List<Order> findAllByCustomerId(Long customerId);
+
+    /**
+     * Find all of customer's orders on a specific date.
+     * @param localDateTime LocalDateTime
+     * @param customerId Long
+     * @return List of Order
+     */
+    List<Order> findAllByCreatedAtAndCustomerId(LocalDateTime localDateTime, Long customerId);
 
     /**
      * Find all orders belonging to a salesman
@@ -36,5 +44,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @param localDateTimeEnd LocalDateTime
      * @return List of Order
      */
-    List<Order> findByCreatedAtBetween(LocalDateTime localDateTimeStart, LocalDateTime localDateTimeEnd);
+    List<Order> findAllByCreatedAtBetween(LocalDateTime localDateTimeStart, LocalDateTime localDateTimeEnd);
+
+    /**
+     * Find all orders belonging to a specific customer conducted between start and end date.
+     * @param localDateTimeStart LocalDateTime
+     * @param localDateTimeEnd LocalDateTime
+     * @param customerId Long
+     * @return List of Order
+     */
+    List<Order> findAllByCreatedAtBetweenAndCustomerId(LocalDateTime localDateTimeStart, LocalDateTime localDateTimeEnd,  Long customerId);
 }

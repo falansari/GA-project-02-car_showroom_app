@@ -1,10 +1,12 @@
 package com.ga.showroom.service;
 
+import com.ga.showroom.exception.AccessDeniedException;
 import com.ga.showroom.exception.InformationExistException;
 import com.ga.showroom.exception.InformationNotFoundException;
 import com.ga.showroom.model.Car;
 import com.ga.showroom.model.CarModel;
 import com.ga.showroom.model.Option;
+import com.ga.showroom.model.enums.Role;
 import com.ga.showroom.repository.CarModelRepository;
 import com.ga.showroom.utility.Uploads;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Paths;
 import java.time.Year;
 import java.util.List;
+
+import static com.ga.showroom.service.UserService.getCurrentLoggedInUser;
 
 @Service
 public class CarModelService {
@@ -106,6 +110,10 @@ public class CarModelService {
      * @return CarModel
      */
     public CarModel createCarModel(CarModel carModel, MultipartFile image) {
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER))
+            throw new AccessDeniedException("You are not allowed to create a car model. " +
+                    "Please contact a salesman or admin.");
+
         CarModel existingCarModel = carModelRepository.findByNameAndMakeYear(carModel.getName(), carModel.getMakeYear());
 
         if (existingCarModel != null)
@@ -127,6 +135,9 @@ public class CarModelService {
      * @return CarModel
      */
     public CarModel updateCarModel(Long carModelId, CarModel carModel, MultipartFile image) {
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER))
+            throw new AccessDeniedException("You are not allowed to update a car model");
+
         CarModel updatedCarModel = getCarModelById(carModelId);
 
         if (updatedCarModel == null) throw new InformationNotFoundException("Car Model with ID " + carModel.getId() + " not found");
@@ -157,6 +168,9 @@ public class CarModelService {
      * @param carModelId Long
      */
     public void deleteCarModel(Long carModelId) {
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER))
+            throw new AccessDeniedException("You are not allowed to delete a car model");
+
         CarModel carModel = getCarModelById(carModelId);
 
         if (carModel == null) throw new InformationNotFoundException("Car Model with ID " + carModelId + " not found");

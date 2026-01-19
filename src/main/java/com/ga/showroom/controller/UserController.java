@@ -2,6 +2,7 @@ package com.ga.showroom.controller;
 
 import com.ga.showroom.model.User;
 import com.ga.showroom.model.UserProfile;
+import com.ga.showroom.model.enums.Role;
 import com.ga.showroom.model.request.*;
 import com.ga.showroom.model.response.ChangePasswordResponse;
 import com.ga.showroom.service.UserService;
@@ -55,6 +56,11 @@ public class UserController {
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         userService.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok("Password reset successfully");
+    }
+
+    @PatchMapping("/change-role")
+    public User updateUserRole(@RequestParam("email") String userEmail, @RequestParam("role") Role role) {
+        return userService.updateUserRole(userEmail, role);
     }
 
     @PostMapping("/verify")

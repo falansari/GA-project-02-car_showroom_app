@@ -1,10 +1,13 @@
 package com.ga.showroom.service;
 
+import com.ga.showroom.exception.AccessDeniedException;
 import com.ga.showroom.exception.InformationExistException;
+import com.ga.showroom.exception.InformationNotFoundException;
 import com.ga.showroom.model.EmailVerificationToken;
 import com.ga.showroom.model.PasswordResetToken;
 import com.ga.showroom.model.User;
 import com.ga.showroom.model.UserProfile;
+import com.ga.showroom.model.enums.Role;
 import com.ga.showroom.model.request.ChangePasswordRequest;
 import com.ga.showroom.model.request.LoginRequest;
 import com.ga.showroom.model.response.ChangePasswordResponse;
@@ -69,10 +72,12 @@ public class UserService {
 
     public User createUser(User userObject) {
         System.out.println("service calling createUser ==> ");
+
         if(!userRepository.existsByEmailAddress(userObject.getEmailAddress())){
             userObject.setPassword(passwordEncoder.encode(userObject.getPassword()));
 
             userObject.setVerified(false);
+            userObject.setRole(Role.CUSTOMER); // Default user role
             User savedUser = userRepository.save(userObject);
 
             EmailVerificationToken token = new EmailVerificationToken();
@@ -85,7 +90,7 @@ public class UserService {
 
             return savedUser;
         } else {
-            throw new InformationExistException("User with email address " + userObject.getUserName() + " already exists.");
+            throw new InformationExistException("User with email address " + userObject.getEmailAddress() + " already exists.");
         }
     }
 
@@ -107,12 +112,12 @@ public class UserService {
             // Check if the user is verified
             if (!myUserDetails.getUser().getVerified()) { // assuming 'enabled' = email verified
                 return ResponseEntity
-                        .status(HttpStatus.FORBIDDEN) // TODO: use the new AccessDeniedException
+                        .status(HttpStatus.FORBIDDEN)
                         .body("Error: Email not verified. Please verify your email before logging in.");
             }
 
             final String JWT = jwtUtils.generateJwtToken(myUserDetails);
-            System.out.println("jwtt"+JWT);
+            System.out.println("jwt"+JWT);
 
             return ResponseEntity.ok(new LoginResponse(JWT));
         } catch (Exception e) {
@@ -120,6 +125,10 @@ public class UserService {
         }
     }
 
+    /**
+     * Get current logged in user
+     * @return User
+     */
     public static User getCurrentLoggedInUser() {
         MyUserDetails userDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         assert userDetails != null;
@@ -138,18 +147,21 @@ public class UserService {
         } else {
             user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
              userRepository.save(user);
-             return new ChangePasswordResponse("Password for " + user.getUserName() + " has been changed successfully!");
+             return new ChangePasswordResponse("Password for " + user.getEmailAddress() + " has been changed successfully!");
         }
     }
 
     public UserProfile updateProfile(UserProfile userProfile, MultipartFile cprImage) {
         User user = userRepository.findUserByEmailAddress(UserService.getCurrentLoggedInUser().getEmailAddress());
 
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)
+                && !user.getId().equals(getCurrentLoggedInUser().getId()))
+            throw new AccessDeniedException("You are not authorized to change another user's profile data. Please contact a salesman or admin.");
+
         UserProfile profile = user.getUserProfile();
 
         profile.setFirstName(userProfile.getFirstName());
         profile.setLastName(userProfile.getLastName());
-        profile.setEmailAddress(userProfile.getEmailAddress());
         profile.setPhoneNumber(userProfile.getPhoneNumber());
         profile.setHomeAddress(userProfile.getHomeAddress());
         profile.setCpr(userProfile.getCpr());
@@ -257,4 +269,22 @@ public class UserService {
         emailVerificationTokenRepository.delete(verificationToken);
     }
 
+    /**
+     * Update existing user's role
+     * @param emailAddress String
+     * @param role Role [ADMIN, SALESMAN, CUSTOMER]
+     * @return User
+     */
+    public User updateUserRole(String emailAddress, Role role) {
+        if (!getCurrentLoggedInUser().getRole().equals(Role.ADMIN))
+            throw new AccessDeniedException("Only an admin is authorized to change user roles.");
+
+        User user = findUserByEmailAddress(emailAddress);
+
+        if (user == null) throw new InformationNotFoundException("User with email address " + emailAddress + " not found.");
+
+        user.setRole(role);
+
+        return userRepository.save(user);
+    }
 }

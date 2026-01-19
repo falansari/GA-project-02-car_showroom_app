@@ -2,6 +2,7 @@ package com.ga.showroom.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ga.showroom.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,8 +21,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String userName;
-
     @Column(unique = true)
     private String emailAddress;
 
@@ -29,8 +28,12 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    /**
+     * ADMIN, SALESMAN, CUSTOMER
+     */
     @Column
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Column
     private Boolean verified;
