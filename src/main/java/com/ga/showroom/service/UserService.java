@@ -90,7 +90,7 @@ public class UserService {
 
             return savedUser;
         } else {
-            throw new InformationExistException("User with email address " + userObject.getUserName() + " already exists.");
+            throw new InformationExistException("User with email address " + userObject.getEmailAddress() + " already exists.");
         }
     }
 
@@ -117,7 +117,7 @@ public class UserService {
             }
 
             final String JWT = jwtUtils.generateJwtToken(myUserDetails);
-            System.out.println("jwtt"+JWT);
+            System.out.println("jwt"+JWT);
 
             return ResponseEntity.ok(new LoginResponse(JWT));
         } catch (Exception e) {
@@ -162,7 +162,6 @@ public class UserService {
 
         profile.setFirstName(userProfile.getFirstName());
         profile.setLastName(userProfile.getLastName());
-        profile.setEmailAddress(userProfile.getEmailAddress());
         profile.setPhoneNumber(userProfile.getPhoneNumber());
         profile.setHomeAddress(userProfile.getHomeAddress());
         profile.setCpr(userProfile.getCpr());
