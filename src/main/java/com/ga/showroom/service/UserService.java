@@ -2,6 +2,7 @@ package com.ga.showroom.service;
 
 import com.ga.showroom.exception.AccessDeniedException;
 import com.ga.showroom.exception.InformationExistException;
+import com.ga.showroom.exception.InformationNotFoundException;
 import com.ga.showroom.model.PasswordResetToken;
 import com.ga.showroom.model.User;
 import com.ga.showroom.model.UserProfile;
@@ -66,22 +67,10 @@ public class UserService {
     public User createUser(User userObject) {
         System.out.println("service calling createUser ==> ");
 
-        switch (userObject.getRole()) { // customer accounts can be made freely without login requirement
-            case ADMIN: // if there's already an admin account in the system only
-                if (getCurrentLoggedInUser().getRole() != Role.ADMIN && userRepository.existsByRole(Role.ADMIN))
-                    throw new AccessDeniedException("Only an admin may create other admin accounts.");
-                break;
-
-            case SALESMAN: // If there's already an admin or salesman account in the system only
-                if (getCurrentLoggedInUser().getRole() != Role.ADMIN
-                        && getCurrentLoggedInUser().getRole() != Role.SALESMAN
-                        && (userRepository.existsByRole(Role.SALESMAN) || userRepository.existsByRole(Role.ADMIN)))
-                    throw new AccessDeniedException("Only an admin or salesman may create other salesman accounts.");
-                break;
-        }
-
         if(!userRepository.existsByEmailAddress(userObject.getEmailAddress())){
             userObject.setPassword(passwordEncoder.encode(userObject.getPassword()));
+            userObject.setRole(Role.CUSTOMER); // Default user role
+
             return userRepository.save(userObject);
         } else {
             throw new InformationExistException("User with email address " + userObject.getEmailAddress() + " already exists.");
@@ -223,6 +212,25 @@ public class UserService {
         message.setText("Reset your password using this token:\n" + token);
 
         mailSender.send(message);
+    }
+
+    /**
+     * Update existing user's role
+     * @param emailAddress String
+     * @param role Role [ADMIN, SALESMAN, CUSTOMER]
+     * @return User
+     */
+    public User updateUserRole(String emailAddress, Role role) {
+        if (!getCurrentLoggedInUser().getRole().equals(Role.ADMIN))
+            throw new AccessDeniedException("Only an admin is authorized to change user roles.");
+
+        User user = findUserByEmailAddress(emailAddress);
+
+        if (user == null) throw new InformationNotFoundException("User with email address " + emailAddress + " not found.");
+
+        user.setRole(role);
+
+        return userRepository.save(user);
     }
 
 }
