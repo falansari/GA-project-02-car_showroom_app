@@ -35,6 +35,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column
+    private Boolean verified;
+
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", orphanRemoval = true)
     private List<Order> ordersRequested;
