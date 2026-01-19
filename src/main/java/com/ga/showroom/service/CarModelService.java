@@ -111,7 +111,8 @@ public class CarModelService {
      */
     public CarModel createCarModel(CarModel carModel, MultipartFile image) {
         if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER))
-            throw new AccessDeniedException("You are not allowed to create a car model");
+            throw new AccessDeniedException("You are not allowed to create a car model. " +
+                    "Please contact a salesman or admin.");
 
         CarModel existingCarModel = carModelRepository.findByNameAndMakeYear(carModel.getName(), carModel.getMakeYear());
 
