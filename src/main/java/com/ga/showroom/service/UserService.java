@@ -1,9 +1,11 @@
 package com.ga.showroom.service;
 
+import com.ga.showroom.exception.AccessDeniedException;
 import com.ga.showroom.exception.InformationExistException;
 import com.ga.showroom.model.PasswordResetToken;
 import com.ga.showroom.model.User;
 import com.ga.showroom.model.UserProfile;
+import com.ga.showroom.model.enums.Role;
 import com.ga.showroom.model.request.ChangePasswordRequest;
 import com.ga.showroom.model.request.LoginRequest;
 import com.ga.showroom.model.response.ChangePasswordResponse;
@@ -63,6 +65,21 @@ public class UserService {
 
     public User createUser(User userObject) {
         System.out.println("service calling createUser ==> ");
+
+        switch (userObject.getRole()) { // customer accounts can be made freely without login requirement
+            case ADMIN: // if there's already an admin account in the system only
+                if (getCurrentLoggedInUser().getRole() != Role.ADMIN && userRepository.existsByRole(Role.ADMIN))
+                    throw new AccessDeniedException("Only an admin may create other admin accounts.");
+                break;
+
+            case SALESMAN: // If there's already an admin or salesman account in the system only
+                if (getCurrentLoggedInUser().getRole() != Role.ADMIN
+                        && getCurrentLoggedInUser().getRole() != Role.SALESMAN
+                        && (userRepository.existsByRole(Role.SALESMAN) || userRepository.existsByRole(Role.ADMIN)))
+                    throw new AccessDeniedException("Only an admin or salesman may create other salesman accounts.");
+                break;
+        }
+
         if(!userRepository.existsByEmailAddress(userObject.getEmailAddress())){
             userObject.setPassword(passwordEncoder.encode(userObject.getPassword()));
             return userRepository.save(userObject);
@@ -120,6 +137,10 @@ public class UserService {
 
     public UserProfile updateProfile(UserProfile userProfile, MultipartFile cprImage) {
         User user = userRepository.findUserByEmailAddress(UserService.getCurrentLoggedInUser().getEmailAddress());
+
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)
+                && !user.getId().equals(getCurrentLoggedInUser().getId()))
+            throw new AccessDeniedException("You are not authorized to change another user's profile data. Please contact a salesman or admin.");
 
         UserProfile profile = user.getUserProfile();
 
