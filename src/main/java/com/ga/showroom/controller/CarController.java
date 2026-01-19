@@ -66,7 +66,6 @@ public class CarController {
      */
     @GetMapping("")
     public List<Car> getCars() {
-        // TODO: if admin user then see all, if normal user see their own vehicles only
         return carService.getAllCars();
     }
 
