@@ -32,6 +32,9 @@ public class User {
     @Column
     private String role;
 
+    @Column
+    private Boolean enabled;
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "customer", orphanRemoval = true)
     private List<Order> ordersRequested;
 
