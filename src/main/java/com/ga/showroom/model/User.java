@@ -2,6 +2,7 @@ package com.ga.showroom.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ga.showroom.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,8 +28,9 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    @Column
-    private String role;
+    @Column()
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", orphanRemoval = true)
