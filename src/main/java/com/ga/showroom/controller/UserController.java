@@ -25,25 +25,21 @@ public class UserController {
 
     @PostMapping("/register")
     public User createUser(@RequestBody User userObject) {
-        System.out.println("Calling createUser ==> ");
         return userService.createUser(userObject);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
-        System.out.println("calling loginUser ==>");
         return userService.loginUser(loginRequest);
     }
 
     @PutMapping("/change-password")
     public ChangePasswordResponse changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
-        System.out.println("calling changePassword ==>");
         return userService.changePassword(changePasswordRequest);
     }
 
     @PutMapping(path = "/update-profile",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UserProfile updateProfile(@RequestPart UserProfile userProfile, @RequestParam("cprImage") MultipartFile cprImage) {
-        System.out.println("calling updateProfile ==> ");
         return userService.updateProfile(userProfile, cprImage);
     }
 
