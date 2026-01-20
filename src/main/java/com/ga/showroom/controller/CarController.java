@@ -4,6 +4,8 @@ import com.ga.showroom.model.Car;
 import com.ga.showroom.service.CarService;
 import com.ga.showroom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -89,5 +91,15 @@ public class CarController {
     @PatchMapping("/{carId}")
     public Car updateCar(@PathVariable Long carId, @RequestBody Car car, @RequestParam("email") String ownerEmail) {
         return carService.updateCar(carId, car, userService.findUserByEmailAddress(ownerEmail));
+    }
+
+    /**
+     * Download stored car's image
+     * @param carId Long
+     * @return ResponseEntity Resource The image
+     */
+    @GetMapping("/image/{carId}")
+    public ResponseEntity<Resource> getImage(@PathVariable("carId") Long carId) {
+        return carService.downloadCarImage(carId);
     }
 }
