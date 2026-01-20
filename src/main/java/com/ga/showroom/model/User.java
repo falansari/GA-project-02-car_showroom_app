@@ -55,7 +55,7 @@ public class User {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner", orphanRemoval = true)
     private List<Car> cars;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "profile_id", referencedColumnName = "id")
     private UserProfile userProfile;
 
