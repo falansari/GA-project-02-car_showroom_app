@@ -74,4 +74,14 @@ public class UserController {
         userService.softDeleteUser(userId);
         return ResponseEntity.ok("User soft-deleted successfully");
     }
+
+    /**
+     * Reactivate inactive (soft deleted) user account.
+     * @param userId Long
+     * @return User
+     */
+    @PatchMapping("/reactivate/{userId}")
+    public User reactivateUserAccount(@PathVariable Long userId) {
+        return userService.reactivateUserAccount(userId);
+    }
 }
