@@ -8,6 +8,7 @@ import com.ga.showroom.model.PasswordResetToken;
 import com.ga.showroom.model.User;
 import com.ga.showroom.model.UserProfile;
 import com.ga.showroom.model.enums.Role;
+import com.ga.showroom.model.enums.UserStatus;
 import com.ga.showroom.model.request.ChangePasswordRequest;
 import com.ga.showroom.model.request.LoginRequest;
 import com.ga.showroom.model.response.ChangePasswordResponse;
@@ -114,6 +115,13 @@ public class UserService {
                 return ResponseEntity
                         .status(HttpStatus.FORBIDDEN)
                         .body("Error: Email not verified. Please verify your email before logging in.");
+            }
+
+            // Check if the user is inactive
+            if (myUserDetails.getUser().getUserStatus() == UserStatus.INACTIVE) {
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body("Error: This account has been deactivated.");
             }
 
             final String JWT = jwtUtils.generateJwtToken(myUserDetails);
@@ -264,6 +272,7 @@ public class UserService {
 
         User user = verificationToken.getUser();
         user.setVerified(true);
+        user.setUserStatus(UserStatus.ACTIVE);
 
         userRepository.save(user);
         emailVerificationTokenRepository.delete(verificationToken);
@@ -287,4 +296,17 @@ public class UserService {
 
         return userRepository.save(user);
     }
+
+    public void softDeleteUser(Long userId) {
+        if (!getCurrentLoggedInUser().getRole().equals(Role.ADMIN))
+            throw new AccessDeniedException("Only an admin is authorized to change user status.");
+
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new InformationNotFoundException("User not found"));
+
+        user.setUserStatus(UserStatus.INACTIVE);
+        userRepository.save(user);
+    }
+
 }
