@@ -33,11 +33,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -184,29 +179,13 @@ public class UserService {
         profile.setHomeAddress(userProfile.getHomeAddress());
         profile.setCpr(userProfile.getCpr());
 
-        // TODO: Replace it with imageUpload() and imageDelete()
-        // handle CPR image upload
-        if (cprImage != null && !cprImage.isEmpty()) {
-            try {
-                String fileName = UUID.randomUUID() + "_" + cprImage.getOriginalFilename();
 
-                // better upload location (outside classpath)
-                Path uploadPath = Paths.get(uploadImagePath);
-                Files.createDirectories(uploadPath);
-
-                Files.copy(
-                        cprImage.getInputStream(),
-                        uploadPath.resolve(fileName),
-                        StandardCopyOption.REPLACE_EXISTING
-                );
-
-                // save filename in DB
-                profile.setCprImage(fileName);
-
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload CPR image", e);
-            }
         }
+
+        // handle CPR image upload
+        if (profile.getCprImage() != null) uploads.deleteImage(uploadImagePath, profile.getCprImage()); // Delete existing CPR image from storage
+        String newCPRImage = uploads.uploadImage(uploadImagePath, cprImage);
+        profile.setCprImage(newCPRImage);
 
         userRepository.save(user);
         return profile;
