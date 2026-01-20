@@ -75,6 +75,11 @@ Note some changes were made after this ERD was drawn, but access to the ERD was 
 - It is strongly recommended that you do not submit dangling code aka unused code as part of this submission. 
 - Make sure to properly format your code for better readability. It's important not to invent your own documentation style, Java docstrings should suffice and inline comments should be included.
 
+## General Approach to Development
+We organized all individual tasks in the GitHub Project Kanban board, and each person chose the tasks they want to do 
+and assigned themselves to them. Each issue gets its own temporary branch that gets worked on independently,
+then merged after a Pull Request review by another team member.
+
 ## Unsolved Problems & Overcome Major Hurdles
 - Forget/Reset Password feature was challenging due to having multiple steps such as sending email, generating token, updating user password etc. We managed to overcome this by seeking help from the instructor assistant. 
 - Overcame merging conflicts with good communication.
