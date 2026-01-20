@@ -21,7 +21,7 @@ import static com.ga.showroom.service.UserService.getCurrentLoggedInUser;
 public class CarService {
     CarRepository carRepository;
     Uploads uploads;
-    String uploadPath = "uploads/model-images"; // TODO: update to use cars' own car-images route if generate image feature added
+    final String uploadPath = "uploads/model-images"; // TODO: update to use cars' own car-images route if generate image feature added
 
     @Autowired
     public CarService(CarRepository carRepository,  Uploads uploads) {

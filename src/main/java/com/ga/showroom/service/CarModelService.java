@@ -25,7 +25,7 @@ import static com.ga.showroom.service.UserService.getCurrentLoggedInUser;
 public class CarModelService {
     CarModelRepository carModelRepository;
     Uploads uploads;
-    String uploadPath = "uploads/model-images";
+    final String uploadPath = "uploads/model-images";
 
     @Autowired
     public CarModelService(CarModelRepository carModelRepository, Uploads uploads) {
