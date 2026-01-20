@@ -74,3 +74,7 @@ Note some changes were made after this ERD was drawn, but access to the ERD was 
 - It is imperative that you document each method that you develop. To put it simply, use doc strings and inline comments. 
 - It is strongly recommended that you do not submit dangling code aka unused code as part of this submission. 
 - Make sure to properly format your code for better readability. It's important not to invent your own documentation style, Java docstrings should suffice and inline comments should be included.
+
+## Unsolved Problems & Overcome Major Hurdles
+- Forget/Reset Password feature was challenging due to having multiple steps such as sending email, generating token, updating user password etc. We managed to overcome this by seeking help from the instructor assistant. 
+- Overcame merging conflicts with good communication.
