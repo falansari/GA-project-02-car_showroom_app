@@ -177,9 +177,12 @@ public class UserService {
         profile.setLastName(userProfile.getLastName());
         profile.setPhoneNumber(userProfile.getPhoneNumber());
         profile.setHomeAddress(userProfile.getHomeAddress());
-        profile.setCpr(userProfile.getCpr());
 
+        if (userProfile.getCpr() != null && !user.getUserProfile().getCpr().equals(userProfile.getCpr())) { // Check CPR doesn't already exist in system
+            if (userRepository.existsByUserProfileCpr(userProfile.getCpr()))
+                throw new InformationExistException("Cpr already exists");
 
+            profile.setCpr(userProfile.getCpr());
         }
 
         // handle CPR image upload
