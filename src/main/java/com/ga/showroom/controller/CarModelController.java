@@ -5,7 +5,9 @@ import com.ga.showroom.model.CarModel;
 import com.ga.showroom.model.Option;
 import com.ga.showroom.service.CarModelService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -131,5 +133,15 @@ public class CarModelController {
     @DeleteMapping("/{carModelId}")
     public void deleteCarModel(@PathVariable("carModelId") Long carModelId) {
         carModelService.deleteCarModel(carModelId);
+    }
+
+    /**
+     * Download stored car model's image
+     * @param carModelId Long
+     * @return ResponseEntity Resource The image
+     */
+    @GetMapping("/image/{carModelId}")
+    public ResponseEntity<Resource> getImage(@PathVariable("carModelId") Long carModelId) {
+        return carModelService.downloadCarModelImage(carModelId);
     }
 }

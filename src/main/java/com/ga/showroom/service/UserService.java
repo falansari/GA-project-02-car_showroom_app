@@ -4,10 +4,7 @@ import com.ga.showroom.exception.AccessDeniedException;
 import com.ga.showroom.exception.AuthenticationException;
 import com.ga.showroom.exception.InformationExistException;
 import com.ga.showroom.exception.InformationNotFoundException;
-import com.ga.showroom.model.EmailVerificationToken;
-import com.ga.showroom.model.PasswordResetToken;
-import com.ga.showroom.model.User;
-import com.ga.showroom.model.UserProfile;
+import com.ga.showroom.model.*;
 import com.ga.showroom.model.enums.Role;
 import com.ga.showroom.model.enums.UserStatus;
 import com.ga.showroom.model.request.ChangePasswordRequest;
@@ -19,8 +16,10 @@ import com.ga.showroom.repository.PasswordResetTokenRepository;
 import com.ga.showroom.repository.UserRepository;
 import com.ga.showroom.security.JWTUtils;
 import com.ga.showroom.security.MyUserDetails;
+import com.ga.showroom.utility.Uploads;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
@@ -40,6 +39,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -52,6 +52,8 @@ public class UserService {
     private PasswordResetTokenRepository passwordResetTokenRepository;
     private JavaMailSender mailSender;
     private EmailVerificationTokenRepository emailVerificationTokenRepository;
+    final String uploadImagePath = "uploads/cpr-images";
+    private final Uploads uploads;
 
     @Autowired
     public UserService(UserRepository userRepository,
@@ -61,7 +63,8 @@ public class UserService {
                        @Lazy MyUserDetails myUserDetails,
                        PasswordResetTokenRepository passwordResetTokenRepository,
                        @Lazy JavaMailSender mailSender,
-                       EmailVerificationTokenRepository emailVerificationTokenRepository) {
+                       EmailVerificationTokenRepository emailVerificationTokenRepository,
+                       Uploads uploads) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
@@ -70,6 +73,7 @@ public class UserService {
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.mailSender = mailSender;
         this.emailVerificationTokenRepository = emailVerificationTokenRepository;
+        this.uploads = uploads;
     }
 
     public User createUser(User userObject) {
@@ -187,7 +191,7 @@ public class UserService {
                 String fileName = UUID.randomUUID() + "_" + cprImage.getOriginalFilename();
 
                 // better upload location (outside classpath)
-                Path uploadPath = Paths.get("uploads/cpr-images");
+                Path uploadPath = Paths.get(uploadImagePath);
                 Files.createDirectories(uploadPath);
 
                 Files.copy(
@@ -345,4 +349,38 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    /**
+     * Get user's info by their ID
+     * @param userId Long
+     * @return User
+     */
+    public User getUserById(Long userId) {
+        if (getCurrentLoggedInUser().getUserStatus().equals(UserStatus.INACTIVE)) throw new AccessDeniedException("This account has been deactivated. Please contact an admin for support.");
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new InformationNotFoundException("User with ID " + userId + " not found"));
+
+        if (!Objects.equals(user.getId(), getCurrentLoggedInUser().getId()) && getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER))
+            throw new AccessDeniedException("You are not authorized to view this user's data. Please contact an admin, salesman or the account owner for support.");
+
+        return  user;
+    }
+
+    /**
+     * Download stored user's CPR image
+     * @param userId Long
+     * @return ResponseEntity Resource The stored image if any [PNG, JPEG]
+     */
+    public ResponseEntity<Resource> downloadCPRImage(Long userId) {
+        if (getCurrentLoggedInUser().getUserStatus().equals(UserStatus.INACTIVE)) throw new AccessDeniedException("This account has been deactivated. Please contact an admin for support.");
+
+        User user = getUserById(userId);
+
+        if (user == null) throw new InformationNotFoundException("User with ID " + userId + " not found");
+
+        if (!Objects.equals(user.getId(), getCurrentLoggedInUser().getId()) && getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER))
+            throw new AccessDeniedException("You are not authorized to view this user's data. Please contact an admin, salesman or the account owner for support.");
+
+        return uploads.downloadImage(uploadImagePath, user.getUserProfile().getCprImage());
+    }
 }

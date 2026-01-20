@@ -7,6 +7,7 @@ import com.ga.showroom.model.request.*;
 import com.ga.showroom.model.response.ChangePasswordResponse;
 import com.ga.showroom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -83,5 +84,25 @@ public class UserController {
     @PatchMapping("/reactivate/{userId}")
     public User reactivateUserAccount(@PathVariable Long userId) {
         return userService.reactivateUserAccount(userId);
+    }
+
+    /**
+     * Get user's info by their ID
+     * @param userId Long
+     * @return User
+     */
+    @GetMapping("/{userId}")
+    public User getUserById(@PathVariable Long userId) {
+        return userService.getUserById(userId);
+    }
+
+    /**
+     * Download stored user's CPR image.
+     * @param userId Long
+     * @return ResponseEntity Resource The image
+     */
+    @GetMapping("/image/{userId}")
+    public ResponseEntity<Resource> getCPRImage(@PathVariable("userId") Long userId) {
+        return userService.downloadCPRImage(userId);
     }
 }

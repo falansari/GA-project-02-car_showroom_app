@@ -8,6 +8,8 @@ import com.ga.showroom.model.enums.Role;
 import com.ga.showroom.repository.CarRepository;
 import com.ga.showroom.utility.Uploads;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import static com.ga.showroom.service.UserService.getCurrentLoggedInUser;
 public class CarService {
     CarRepository carRepository;
     Uploads uploads;
+    final String uploadPath = "uploads/model-images"; // TODO: update to use cars' own car-images route if generate image feature added
 
     @Autowired
     public CarService(CarRepository carRepository,  Uploads uploads) {
@@ -192,5 +195,18 @@ public class CarService {
         if (owner != updatedCar.getOwner()) updatedCar.setOwner(owner);
 
         return carRepository.save(updatedCar);
+    }
+
+    /**
+     * Download stored car's image
+     * @param carId Long
+     * @return ResponseEntity Resource The stored image if any [PNG, JPEG]
+     */
+    public ResponseEntity<Resource> downloadCarImage(Long carId) {
+        Car car = getCarById(carId);
+
+        if (car == null) throw new InformationNotFoundException("Car with ID " + carId + " not found");
+
+        return uploads.downloadImage(uploadPath, car.getImage());
     }
 }

@@ -1,12 +1,19 @@
 package com.ga.showroom.utility;
 
 import com.ga.showroom.exception.BadRequestException;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.UUID;
@@ -52,6 +59,25 @@ public class Uploads {
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload image", e);
+        }
+    }
+
+    /**
+     * Download a stored image file.
+     * @param uploadPath String Image's upload path [cpr-images, model-images, car-images]
+     * @param fileName String image's stored filename in database
+     * @return ResponseEntity Resource the image.
+     */
+    public ResponseEntity<Resource> downloadImage(String uploadPath, String fileName) {
+        try {
+            Path path = Paths.get(uploadPath, fileName);
+            Resource resource = new UrlResource(path.toUri());
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.valueOf(URLConnection.guessContentTypeFromName(fileName)))
+                    .body(resource);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
         }
     }
 

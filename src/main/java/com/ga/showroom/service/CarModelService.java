@@ -10,6 +10,8 @@ import com.ga.showroom.model.enums.Role;
 import com.ga.showroom.repository.CarModelRepository;
 import com.ga.showroom.utility.Uploads;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +25,7 @@ import static com.ga.showroom.service.UserService.getCurrentLoggedInUser;
 public class CarModelService {
     CarModelRepository carModelRepository;
     Uploads uploads;
+    final String uploadPath = "uploads/model-images";
 
     @Autowired
     public CarModelService(CarModelRepository carModelRepository, Uploads uploads) {
@@ -119,7 +122,7 @@ public class CarModelService {
         if (existingCarModel != null)
             throw new InformationExistException("Car model with name " + carModel.getName() + " and year " + carModel.getMakeYear() + " already exists");
 
-        String uploadedImage = uploads.uploadImage("uploads/model-images", image);
+        String uploadedImage = uploads.uploadImage(uploadPath, image);
 
         if (uploadedImage != null) carModel.setImage(uploadedImage);
 
@@ -147,10 +150,10 @@ public class CarModelService {
         if (existingCarModel != null && updatedCarModel != existingCarModel)
             throw new InformationExistException("Car model with name " + carModel.getName() + " already exists");
 
-        String uploadedImage = uploads.uploadImage("uploads/model-images", image);
+        String uploadedImage = uploads.uploadImage(uploadPath, image);
 
         if (uploadedImage != null) {
-            uploads.deleteImage(Paths.get("uploads/model-images", updatedCarModel.getImage()));
+            uploads.deleteImage(Paths.get(uploadedImage, updatedCarModel.getImage()));
 
             updatedCarModel.setImage(uploadedImage);
         }
@@ -176,5 +179,18 @@ public class CarModelService {
         if (carModel == null) throw new InformationNotFoundException("Car Model with ID " + carModelId + " not found");
 
         carModelRepository.delete(carModel);
+    }
+
+    /**
+     * Download stored car model's image
+     * @param carModelId Long
+     * @return ResponseEntity Resource The stored image if any [PNG, JPEG]
+     */
+    public ResponseEntity<Resource> downloadCarModelImage(Long carModelId) {
+        CarModel carModel = getCarModelById(carModelId);
+
+        if (carModel ==  null) throw new InformationNotFoundException("Car Model with ID " + carModelId + " not found");
+
+        return uploads.downloadImage(uploadPath, carModel.getImage());
     }
 }
