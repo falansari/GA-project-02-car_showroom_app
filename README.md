@@ -25,7 +25,7 @@ Note some changes were made after this ERD was drawn, but access to the ERD was 
 
 ## Team Members
 - Fatima Abdulla Alansari
-  - Git Management
+  - Git & project Management
   - App Logic & Development:
     - Services & Controllers
     - Exception handling
@@ -80,6 +80,12 @@ We organized all individual tasks in the GitHub Project Kanban board, and each p
 and assigned themselves to them. Each issue gets its own temporary branch that gets worked on independently,
 then merged after a Pull Request review by another team member.
 
-## Unsolved Problems & Overcome Major Hurdles
-- Forget/Reset Password feature was challenging due to having multiple steps such as sending email, generating token, updating user password etc. We managed to overcome this by seeking help from the instructor assistant. 
+## Unsolved Problems
+- Generate image through a third party API was attempted as a feature add-on however all of the APIs were paid only or too restrictive for our use case so it couldn't be implemented.
+
+## Overcome Major Hurdles
+- Forget/Reset Password feature was challenging due to having multiple steps such as sending email, generating token, updating user password etc. We managed to overcome this by seeking help from the instructor assistant.
 - Overcame merging conflicts with good communication.
+- Early on there were a lot of git conflict issues, they were resolved by adding stricter contribution rules and updating the .gitignore file to include OS-specific files and other setting files.
+- The addition of Spring Security hijacked the custom exception messages we had made originally, but we fixed that by adding a GlobalExceptionHandler.
+- The work load was excessive as it's quite a large app concept but we pushed it through.
