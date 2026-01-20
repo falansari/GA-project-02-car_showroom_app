@@ -50,6 +50,75 @@ Note some changes were made after this ERD was drawn, but access to the ERD was 
 
 ## API Endpoints
 
+### User "/auth/users"
+- createUser: POST /register
+- loginUser: POST /login
+- changePassword: PUT /change-password
+- updateProfile: PUT /update-profile
+- forgotPassword: POST /forgot-password
+- resetPassword: POST /reset-password
+- updateUserRole: PATCH /change-role
+- verifyEmail: POST /verify
+- softDeleteUser: PATCH /soft-delete/{userId}
+- reactivateUserAccount: PATCH /reactivate/{userId}
+- getUserById: GET /{userId}
+- getCPRImage: GET /image/{userId}
+
+### Car "api/cars"
+- getCarById: GET /{carId}
+- getCarByRegistrationNumber: GET /registration/{registrationNumber}
+- getCarByInsurancePolicy: GET /insurance/{insurancePolicy}
+- getCarByVinNumber: GET /vin/{vinNumber}
+- getCars: GET "api/cars"
+- getCarsByModel: GET /model/{modelId
+- updateCar: PATCH /{carId}
+- getImage: GET /image/{carId}
+
+### Car Model "api/car-models"
+- getCarModelById: GET /{carModelId}
+- getCarModelByName: GET /name/{carModelName}
+- getAllCarModels: GET "api/car-models"
+- getAllCarModelsByYear: GET /year/{year}
+- getAllCarModelsByYearBetween: GET /years
+- getAllCarModelsByManufacturer: GET /manufacturer
+- getAllOptionsByCarModelId: GET /{carModelId}/options
+- getAllCarsByCarModelId: GET /{carModelId}/cars
+- createCarModel: POST "api/car-models"
+- updateCarModel: PATCH /{carModelId}
+- deleteCarModel: DELETE /{carModelId}
+- getImage: GET /image/{carModelId}
+
+### Car Option "api/car-options"
+- getAllCarOptions: GET "api/car-options"
+- getCarOptionById: GET /{carOptionId}
+- getCarOptionByOptionIdAndCarId: GET /option/{optionId}/car/{carId}
+- getCarOptionsByOptionId: GET /option/{optionId}
+- getCarOptionsByCarId: GET /car/{carId}
+- createCarOption: POST "api/car-options"
+
+### Option Category "api/option-categories"
+- getOptionCategoryById: GET /{optionCategoryId}
+- getOptionCategoryByName: GET category/{categoryName}
+- getAllOptionCategories: GET "api/option-categories"
+- createOptionCategory: POST "api/option-categories"
+- updateOptionCategory: PATCH /{optionCategoryId}
+- deleteOptionCategory: DELETE {optionCategoryId}
+
+### Option "api/"
+- getOptions: GET car-models/{carModelId}/option-categories/{optionCategoryId}/options
+- getOptionById: GET options/{optionId}
+- getOption: GET car-models/{carModelId}/option-categories/{optionCategoryId}/options/{optionId}
+- createOption: POST car-models/{carModelId}/option-categories/{optionCategoryId}/options
+- updateOption: PATCH car-models/{carModelId}/option-categories/{optionCategoryId}/options/{optionId}
+
+### Order "api/orders"
+- getAllOrders: GET api/orders
+- getOrderById: GET /{orderId}
+- getOrdersByOrderDate: GET /date/{orderDate}
+- getOrdersByCustomerId: GET /customer/{customerId}
+- getOrdersBySalesmanId: GET /salesman/{salesmanId}
+- getOrdersByOrderDateBetween: GET /between
+- createOrder: POST api/orders
 
 ## Implemented Features List
 - Persisting 10 models.
