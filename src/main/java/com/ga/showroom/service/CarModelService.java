@@ -152,9 +152,8 @@ public class CarModelService {
 
         String uploadedImage = uploads.uploadImage(uploadPath, image);
 
-        if (uploadedImage != null) {
-            uploads.deleteImage(Paths.get(uploadedImage, updatedCarModel.getImage()));
-
+        if (uploadedImage != null) { // Delete existing image from storage
+            uploads.deleteImage(uploadPath,  updatedCarModel.getImage());
             updatedCarModel.setImage(uploadedImage);
         }
 

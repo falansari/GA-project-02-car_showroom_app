@@ -83,11 +83,14 @@ public class Uploads {
 
     /**
      * Delete an existing image from storage.
-     * @param filePath Path resolved filepath including storage location + image name.
+     * @param uploadPath String File's upload path ["uploads/cpr-images", "uploads/model-images", ...]
+     * @param filename String name of the stored file
      */
-    public void deleteImage(Path filePath) {
+    public void deleteImage(String uploadPath, String filename) {
         try {
-            java.nio.file.Files.deleteIfExists(filePath);
+            Path path = Paths.get(uploadPath, filename);
+
+            java.nio.file.Files.deleteIfExists(path);
         } catch (IOException e) {
             throw new RuntimeException("Failed to delete image", e);
         }

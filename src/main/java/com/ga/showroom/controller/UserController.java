@@ -13,63 +13,114 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * User API
+ */
 @RestController
 @RequestMapping(path = "/auth/users")
 public class UserController {
     private UserService userService;
 
+    /**
+     * Initialize User service
+     * @param userService UserService
+     */
     @Autowired
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
 
+    /**
+     * Register a new user
+     * @param userObject User
+     * @return User
+     */
     @PostMapping("/register")
     public User createUser(@RequestBody User userObject) {
-        System.out.println("Calling createUser ==> ");
         return userService.createUser(userObject);
     }
 
+    /**
+     * Login an existing user
+     * @param loginRequest LoginRequest [emailAddress, password]
+     * @return ResponseEntity ? Ok message
+     */
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
-        System.out.println("calling loginUser ==>");
         return userService.loginUser(loginRequest);
     }
 
+    /**
+     * Change existing user's password
+     * @param changePasswordRequest ChangePasswordRequest [oldPassword, newPassword]
+     * @return ChangePasswordResponse
+     */
     @PutMapping("/change-password")
     public ChangePasswordResponse changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
-        System.out.println("calling changePassword ==>");
         return userService.changePassword(changePasswordRequest);
     }
 
+    /**
+     * Update user's profile
+     * @param userProfile UserProfile
+     * @param cprImage MultipartFile [PNG, JPEG]
+     * @return UserProfile
+     */
     @PutMapping(path = "/update-profile",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UserProfile updateProfile(@RequestPart UserProfile userProfile, @RequestParam("cprImage") MultipartFile cprImage) {
-        System.out.println("calling updateProfile ==> ");
         return userService.updateProfile(userProfile, cprImage);
     }
 
+    /**
+     * Send forgot password token to registered e-mail address to gain access to reset password
+     * @param request ForgetPasswordRequest emailAddress
+     * @return ResponseEntity ?
+     */
     @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@RequestBody ForgetPasswordRequest request) {
         userService.forgotPassword(request.getEmailAddress());
         return ResponseEntity.ok("If the email exists, a password reset link has been sent");
     }
 
+    /**
+     * Reset forgotten user's password using token authentication
+     * @param request ResetPasswordRequest [token, newPassword]
+     * @return ResponseEntity ?
+     */
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         userService.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok("Password reset successfully");
     }
 
+    /**
+     * Change user's role
+     * @param userEmail String
+     * @param role Role [ADMIN, SALESMAN, CUSTOMER]
+     * @apiNote PATCH
+     * @return User
+     */
     @PatchMapping("/change-role")
     public User updateUserRole(@RequestParam("email") String userEmail, @RequestParam("role") Role role) {
         return userService.updateUserRole(userEmail, role);
     }
 
+    /**
+     * Verify a new user's account using verification token sent to user's email
+     * @param request VerifyEmailRequest token
+     * @return ResponseEntity ?
+     */
     @PostMapping("/verify")
     public ResponseEntity<?> verifyEmail(@RequestBody VerifyEmailRequest request) {
         userService.verifyEmail(request.getToken());
         return ResponseEntity.ok("Email has been verified successfully!");
     }
 
+    /**
+     * Deactivate a user's account
+     * @param userId Long
+     * @return ResponseEntity ?
+     */
     @PatchMapping("/soft-delete/{userId}")
     public ResponseEntity<?> softDeleteUser(@PathVariable Long userId) {
         userService.softDeleteUser(userId);

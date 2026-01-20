@@ -41,9 +41,6 @@ public class Order {
     @JoinColumn(name = "salesman_id")
     private User salesman;
 
-    //@OneToMany(fetch = FetchType.EAGER, mappedBy = "order", orphanRemoval = true)
-    //private List<OrderLine> orderLines;
-
     @CreationTimestamp
     @Column
     private LocalDateTime createdAt;

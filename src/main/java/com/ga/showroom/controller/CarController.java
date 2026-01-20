@@ -10,12 +10,20 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Cars API
+ */
 @RestController
 @RequestMapping(path = "api/cars")
 public class CarController {
     private CarService carService;
     private UserService userService;
 
+    /**
+     * Initialize Car service
+     * @param carService CarService
+     * @param userService UserService
+     */
     @Autowired
     public void setCarService(CarService carService, UserService userService) {
         this.carService = carService;

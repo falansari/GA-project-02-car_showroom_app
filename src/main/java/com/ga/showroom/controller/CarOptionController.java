@@ -7,11 +7,18 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Car Option API
+ */
 @RestController
 @RequestMapping(path = "api/car-options")
 public class CarOptionController {
     private CarOptionService carOptionService;
 
+    /**
+     * Initialize Car option service
+     * @param carOptionService CarOptionService
+     */
     @Autowired
     public void setCarOptionService(CarOptionService carOptionService) {
         this.carOptionService = carOptionService;
