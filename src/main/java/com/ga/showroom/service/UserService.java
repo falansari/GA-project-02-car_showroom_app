@@ -1,6 +1,7 @@
 package com.ga.showroom.service;
 
 import com.ga.showroom.exception.AccessDeniedException;
+import com.ga.showroom.exception.AuthenticationException;
 import com.ga.showroom.exception.InformationExistException;
 import com.ga.showroom.exception.InformationNotFoundException;
 import com.ga.showroom.model.EmailVerificationToken;
@@ -210,9 +211,9 @@ public class UserService {
     @Transactional
     public void forgotPassword(String emailAddress) {
         User user = userRepository.findUserByEmailAddress(emailAddress);
-        if (user == null) {
-            return;
-        }
+        if (user == null) throw new InformationNotFoundException("User with email address " + emailAddress + " not found");
+
+        if (user.getUserStatus().equals(UserStatus.INACTIVE)) throw new AccessDeniedException("This account has been deactivated. Please contact an admin for support.");
 
         passwordResetTokenRepository.deleteByUser(user);
         passwordResetTokenRepository.flush();
@@ -230,10 +231,10 @@ public class UserService {
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken resetToken = passwordResetTokenRepository
                 .findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid token"));
+                .orElseThrow(() -> new AuthenticationException("Invalid token"));
 
         if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Token expired");
+            throw new AuthenticationException("Token expired");
         }
 
         User user = resetToken.getUser();
@@ -273,10 +274,10 @@ public class UserService {
     public void verifyEmail(String token) {
         EmailVerificationToken verificationToken = emailVerificationTokenRepository
                         .findByToken(token)
-                        .orElseThrow(() -> new RuntimeException("Invalid verification token"));
+                        .orElseThrow(() -> new AuthenticationException("Invalid verification token"));
 
         if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Verification token expired");
+            throw new AuthenticationException("Verification token expired");
         }
 
         User user = verificationToken.getUser();
