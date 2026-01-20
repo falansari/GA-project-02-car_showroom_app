@@ -14,11 +14,18 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Year;
 import java.util.List;
 
+/**
+ * Car Model API
+ */
 @RestController
 @RequestMapping(path = "api/car-models")
 public class CarModelController {
     private CarModelService carModelService;
 
+    /**
+     * Initialize Car model service
+     * @param carModelService CarModelService
+     */
     @Autowired
     public void setCarModelService(CarModelService carModelService) {
         this.carModelService = carModelService;

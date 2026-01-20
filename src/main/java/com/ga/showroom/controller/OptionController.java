@@ -7,11 +7,18 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Option API
+ */
 @RestController
 @RequestMapping(path = "api/")
 public class OptionController {
     private OptionService optionService;
 
+    /**
+     * Initialize Option service
+     * @param optionService OptionService
+     */
     @Autowired
     public void setOptionService(OptionService optionService){
         this.optionService = optionService;
@@ -74,7 +81,4 @@ public class OptionController {
                                @PathVariable("optionId") Long optionId, @RequestBody Option option){
         return optionService.updateOption(carModelId, optionCategoryId, optionId, option);
     }
-
-
-
 }

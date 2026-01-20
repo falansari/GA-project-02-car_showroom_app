@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Option Category API
+ */
 @RestController
 @RequestMapping(path = "api/option-categories")
 public class OptionCategoryController {
