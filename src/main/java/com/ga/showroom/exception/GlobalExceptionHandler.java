@@ -43,4 +43,28 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());
     }
+
+    /**
+     * Handle access denied exception
+     * @param e Exception
+     * @return ResponseEntity String
+     */
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public ResponseEntity<String> handleAccessDenied(Exception e) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(e.getMessage());
+    }
+
+    /**
+     * Handle unauthorized authentication exception
+     * @param e Exception
+     * @return ResponseEntity String
+     */
+    @ExceptionHandler(value = AuthenticationException.class)
+    public ResponseEntity<String> handleAuthentication(Exception e) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(e.getMessage());
+    }
 }

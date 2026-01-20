@@ -24,9 +24,6 @@ public class UserProfile {
     private String lastName;
 
     @Column
-    private String emailAddress;
-
-    @Column
     private Long phoneNumber;
 
     @Column
@@ -39,7 +36,7 @@ public class UserProfile {
     private String cprImage;
 
     @JsonIgnore
-    @OneToOne(mappedBy = "userProfile", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "userProfile")
     private User user;
 
 }

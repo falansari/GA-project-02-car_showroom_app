@@ -2,10 +2,8 @@ package com.ga.showroom.controller;
 
 import com.ga.showroom.model.User;
 import com.ga.showroom.model.UserProfile;
-import com.ga.showroom.model.request.ChangePasswordRequest;
-import com.ga.showroom.model.request.ForgetPasswordRequest;
-import com.ga.showroom.model.request.LoginRequest;
-import com.ga.showroom.model.request.ResetPasswordRequest;
+import com.ga.showroom.model.enums.Role;
+import com.ga.showroom.model.request.*;
 import com.ga.showroom.model.response.ChangePasswordResponse;
 import com.ga.showroom.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +34,13 @@ public class UserController {
         return userService.loginUser(loginRequest);
     }
 
-    @PutMapping("/changePassword")
+    @PutMapping("/change-password")
     public ChangePasswordResponse changePassword(@RequestBody ChangePasswordRequest changePasswordRequest) {
         System.out.println("calling changePassword ==>");
         return userService.changePassword(changePasswordRequest);
     }
 
-    @PutMapping(path = "/updateProfile",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(path = "/update-profile",  consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UserProfile updateProfile(@RequestPart UserProfile userProfile, @RequestParam("cprImage") MultipartFile cprImage) {
         System.out.println("calling updateProfile ==> ");
         return userService.updateProfile(userProfile, cprImage);
@@ -58,5 +56,32 @@ public class UserController {
     public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
         userService.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok("Password reset successfully");
+    }
+
+    @PatchMapping("/change-role")
+    public User updateUserRole(@RequestParam("email") String userEmail, @RequestParam("role") Role role) {
+        return userService.updateUserRole(userEmail, role);
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<?> verifyEmail(@RequestBody VerifyEmailRequest request) {
+        userService.verifyEmail(request.getToken());
+        return ResponseEntity.ok("Email has been verified successfully!");
+    }
+
+    @PatchMapping("/soft-delete/{userId}")
+    public ResponseEntity<?> softDeleteUser(@PathVariable Long userId) {
+        userService.softDeleteUser(userId);
+        return ResponseEntity.ok("User soft-deleted successfully");
+    }
+
+    /**
+     * Reactivate inactive (soft deleted) user account.
+     * @param userId Long
+     * @return User
+     */
+    @PatchMapping("/reactivate/{userId}")
+    public User reactivateUserAccount(@PathVariable Long userId) {
+        return userService.reactivateUserAccount(userId);
     }
 }

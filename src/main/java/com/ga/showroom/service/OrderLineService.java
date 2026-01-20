@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * UNUSED IN CURRENT SYSTEM DESIGN. 1 ORDER HAS 1 CAR SO NO ORDER LINES.
+ */
 @Service
 public class OrderLineService {
     OrderLineRepository orderLineRepository;

@@ -29,4 +29,19 @@ public interface CarOptionRepository extends JpaRepository<CarOption, Long> {
      * @return List of CarOption
      */
     List<CarOption> findAllByCarId(Long carId);
+
+    /**
+     * Find all car options belonging to vehicles owned by owner ID
+     * @param carOwnerId Long
+     * @return List of CarOption
+     */
+    List<CarOption> findAllByCarOwnerId(Long carOwnerId);
+
+    /**
+     * Find all car options belonging to a specific option for a specific customer's cars
+     * @param optionId Long
+     * @param carOwnerId Long
+     * @return List of CarOption
+     */
+    List<CarOption> findAllByOptionIdAndCarOwnerId(Long optionId, Long carOwnerId);
 }

@@ -49,6 +49,7 @@ public class SecurityConfiguration {
                                 "/auth/users/register",
                                 "/auth/users/forgot-password",
                                 "/auth/users/reset-password",
+                                "/auth/users/verify",
                                 "/error"
                         ).permitAll().anyRequest().authenticated());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

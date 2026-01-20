@@ -1,19 +1,27 @@
 package com.ga.showroom.service;
 
+import com.ga.showroom.exception.AccessDeniedException;
+import com.ga.showroom.exception.AuthenticationException;
 import com.ga.showroom.exception.InformationExistException;
+import com.ga.showroom.exception.InformationNotFoundException;
+import com.ga.showroom.model.EmailVerificationToken;
 import com.ga.showroom.model.PasswordResetToken;
 import com.ga.showroom.model.User;
 import com.ga.showroom.model.UserProfile;
+import com.ga.showroom.model.enums.Role;
+import com.ga.showroom.model.enums.UserStatus;
 import com.ga.showroom.model.request.ChangePasswordRequest;
 import com.ga.showroom.model.request.LoginRequest;
 import com.ga.showroom.model.response.ChangePasswordResponse;
 import com.ga.showroom.model.response.LoginResponse;
+import com.ga.showroom.repository.EmailVerificationTokenRepository;
 import com.ga.showroom.repository.PasswordResetTokenRepository;
 import com.ga.showroom.repository.UserRepository;
 import com.ga.showroom.security.JWTUtils;
 import com.ga.showroom.security.MyUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -43,6 +51,7 @@ public class UserService {
     private MyUserDetails myUserDetails;
     private PasswordResetTokenRepository passwordResetTokenRepository;
     private JavaMailSender mailSender;
+    private EmailVerificationTokenRepository emailVerificationTokenRepository;
 
     @Autowired
     public UserService(UserRepository userRepository,
@@ -51,7 +60,8 @@ public class UserService {
                        @Lazy AuthenticationManager authenticationManager,
                        @Lazy MyUserDetails myUserDetails,
                        PasswordResetTokenRepository passwordResetTokenRepository,
-                       @Lazy JavaMailSender mailSender) {
+                       @Lazy JavaMailSender mailSender,
+                       EmailVerificationTokenRepository emailVerificationTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
@@ -59,15 +69,31 @@ public class UserService {
         this.myUserDetails = myUserDetails;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.mailSender = mailSender;
+        this.emailVerificationTokenRepository = emailVerificationTokenRepository;
     }
 
     public User createUser(User userObject) {
         System.out.println("service calling createUser ==> ");
+
         if(!userRepository.existsByEmailAddress(userObject.getEmailAddress())){
             userObject.setPassword(passwordEncoder.encode(userObject.getPassword()));
-            return userRepository.save(userObject);
+
+            userObject.setVerified(false);
+            userObject.setUserStatus(UserStatus.ACTIVE);
+            userObject.setRole(Role.CUSTOMER); // Default user role
+            User savedUser = userRepository.save(userObject);
+
+            EmailVerificationToken token = new EmailVerificationToken();
+            token.setToken(UUID.randomUUID().toString());
+            token.setUser(savedUser);
+            token.setExpiryDate(LocalDateTime.now().plusMinutes(15));
+
+            emailVerificationTokenRepository.save(token);
+            sendVerificationEmail(userObject.getEmailAddress(), token.getToken());
+
+            return savedUser;
         } else {
-            throw new InformationExistException("User with email address " + userObject.getUserName() + " already exists.");
+            throw new InformationExistException("User with email address " + userObject.getEmailAddress() + " already exists.");
         }
     }
 
@@ -82,10 +108,27 @@ public class UserService {
                     .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmailAddress(), loginRequest.getPassword()));
             System.out.println("authentication :: "+authentication);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
             myUserDetails = (MyUserDetails) authentication.getPrincipal();
             System.out.println("myUserDetails :::: "+myUserDetails.getUsername());
+
+            // Check if the user is inactive
+            if (myUserDetails.getUser().getUserStatus() == UserStatus.INACTIVE) {
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body("Error: This account has been deactivated. Please contact an admin for support.");
+            }
+
+            // Check if the user is verified
+            if (!myUserDetails.getUser().getVerified()) { // assuming 'enabled' = email verified
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body("Error: Email not verified. Please verify your email before logging in.");
+            }
+
             final String JWT = jwtUtils.generateJwtToken(myUserDetails);
-            System.out.println("jwtt"+JWT);
+            System.out.println("jwt"+JWT);
+
             return ResponseEntity.ok(new LoginResponse(JWT));
         } catch (Exception e) {
             return ResponseEntity.ok(new LoginResponse("Error : user name or password is incorrect"));
@@ -94,7 +137,7 @@ public class UserService {
 
     /**
      * Get current logged in user
-     * @return
+     * @return User
      */
     public static User getCurrentLoggedInUser() {
         MyUserDetails userDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -105,6 +148,8 @@ public class UserService {
     public ChangePasswordResponse changePassword(ChangePasswordRequest changePasswordRequest) {
         User user = userRepository.findUserByEmailAddress(UserService.getCurrentLoggedInUser().getEmailAddress());
 
+        if (user.getUserStatus() == UserStatus.INACTIVE) throw new AccessDeniedException("This account has been deactivated. Please contact an admin for support.");
+
         if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())) {
             return new ChangePasswordResponse("Old password incorrect");
         }
@@ -114,22 +159,28 @@ public class UserService {
         } else {
             user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
              userRepository.save(user);
-             return new ChangePasswordResponse("Password for " + user.getUserName() + " has been changed successfully!");
+             return new ChangePasswordResponse("Password for " + user.getEmailAddress() + " has been changed successfully!");
         }
     }
 
     public UserProfile updateProfile(UserProfile userProfile, MultipartFile cprImage) {
         User user = userRepository.findUserByEmailAddress(UserService.getCurrentLoggedInUser().getEmailAddress());
 
+        if (user.getUserStatus().equals(UserStatus.INACTIVE)) throw new AccessDeniedException("This account has been deactivated. Please contact an admin for support.");
+
+        if (getCurrentLoggedInUser().getRole().equals(Role.CUSTOMER)
+                && !user.getId().equals(getCurrentLoggedInUser().getId()))
+            throw new AccessDeniedException("You are not authorized to change another user's profile data. Please contact a salesman or admin.");
+
         UserProfile profile = user.getUserProfile();
 
         profile.setFirstName(userProfile.getFirstName());
         profile.setLastName(userProfile.getLastName());
-        profile.setEmailAddress(userProfile.getEmailAddress());
         profile.setPhoneNumber(userProfile.getPhoneNumber());
         profile.setHomeAddress(userProfile.getHomeAddress());
         profile.setCpr(userProfile.getCpr());
 
+        // TODO: Replace it with imageUpload() and imageDelete()
         // handle CPR image upload
         if (cprImage != null && !cprImage.isEmpty()) {
             try {
@@ -160,9 +211,9 @@ public class UserService {
     @Transactional
     public void forgotPassword(String emailAddress) {
         User user = userRepository.findUserByEmailAddress(emailAddress);
-        if (user == null) {
-            return;
-        }
+        if (user == null) throw new InformationNotFoundException("User with email address " + emailAddress + " not found");
+
+        if (user.getUserStatus().equals(UserStatus.INACTIVE)) throw new AccessDeniedException("This account has been deactivated. Please contact an admin for support.");
 
         passwordResetTokenRepository.deleteByUser(user);
         passwordResetTokenRepository.flush();
@@ -180,13 +231,16 @@ public class UserService {
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken resetToken = passwordResetTokenRepository
                 .findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid token"));
+                .orElseThrow(() -> new AuthenticationException("Invalid token"));
 
         if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Token expired");
+            throw new AuthenticationException("Token expired");
         }
 
         User user = resetToken.getUser();
+
+        if (user.getUserStatus().equals(UserStatus.INACTIVE)) throw new AccessDeniedException("This account has been deactivated. Please contact an admin for support.");
+
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
@@ -203,6 +257,92 @@ public class UserService {
         message.setText("Reset your password using this token:\n" + token);
 
         mailSender.send(message);
+    }
+
+    private void sendVerificationEmail(String toEmail, String token) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+
+        message.setFrom("no-reply@showroom.com");
+
+        message.setSubject("Verify Email Request");
+        message.setText("Verify your email using this token:\n" + token);
+
+        mailSender.send(message);
+    }
+
+    public void verifyEmail(String token) {
+        EmailVerificationToken verificationToken = emailVerificationTokenRepository
+                        .findByToken(token)
+                        .orElseThrow(() -> new AuthenticationException("Invalid verification token"));
+
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new AuthenticationException("Verification token expired");
+        }
+
+        User user = verificationToken.getUser();
+
+        if (user.getUserStatus().equals(UserStatus.INACTIVE)) throw new AccessDeniedException("This account has been deactivated. Please contact an admin for support.");
+
+        user.setVerified(true);
+
+        userRepository.save(user);
+        emailVerificationTokenRepository.delete(verificationToken);
+    }
+
+    /**
+     * Update existing user's role
+     * @param emailAddress String
+     * @param role Role [ADMIN, SALESMAN, CUSTOMER]
+     * @return User
+     */
+    public User updateUserRole(String emailAddress, Role role) {
+        if (!getCurrentLoggedInUser().getRole().equals(Role.ADMIN))
+            throw new AccessDeniedException("Only an admin is authorized to change user roles.");
+
+        User user = findUserByEmailAddress(emailAddress);
+
+        if (user == null) throw new InformationNotFoundException("User with email address " + emailAddress + " not found.");
+
+        if (user.getUserStatus().equals(UserStatus.INACTIVE)) throw new AccessDeniedException("This account has been deactivated. Please contact an admin for support.");
+
+        user.setRole(role);
+
+        return userRepository.save(user);
+    }
+
+    public void softDeleteUser(Long userId) {
+        if (!getCurrentLoggedInUser().getRole().equals(Role.ADMIN))
+            throw new AccessDeniedException("Only an admin is authorized to change user status.");
+
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new InformationNotFoundException("User not found"));
+
+
+        if (user.getUserStatus().equals(UserStatus.INACTIVE)) throw new AccessDeniedException("This account has already been deactivated.");
+
+        user.setUserStatus(UserStatus.INACTIVE);
+        userRepository.save(user);
+    }
+
+    /**
+     * Reset user account status back to active.
+     * @param userId Long
+     * @return User
+     */
+    public User reactivateUserAccount(Long userId) {
+        if (!getCurrentLoggedInUser().getRole().equals(Role.ADMIN))
+            throw new AccessDeniedException("Only an admin is authorized to change user status.");
+
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new InformationNotFoundException("User with ID " + userId + " not found"));
+
+        if (user.getUserStatus().equals(UserStatus.ACTIVE)) throw new AccessDeniedException("This account is already activated.");
+
+        user.setUserStatus(UserStatus.ACTIVE);
+        return userRepository.save(user);
     }
 
 }
