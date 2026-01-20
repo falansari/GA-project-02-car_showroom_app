@@ -3,6 +3,7 @@ package com.ga.showroom.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ga.showroom.model.enums.Role;
+import com.ga.showroom.model.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,6 +38,10 @@ public class User {
 
     @Column
     private Boolean verified;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus;
 
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer", orphanRemoval = true)
