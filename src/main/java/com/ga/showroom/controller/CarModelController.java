@@ -87,7 +87,7 @@ public class CarModelController {
      * @return List of CarModel
      */
     @GetMapping("/manufacturer")
-    public List<CarModel> getAllCarModelsByManufacturer(@RequestParam String manufacturer) {
+    public List<CarModel> getAllCarModelsByManufacturer(@RequestParam("manufacturer") String manufacturer) {
         return carModelService.getAllByManufacturer(manufacturer);
     }
 

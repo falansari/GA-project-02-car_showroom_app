@@ -55,7 +55,6 @@ application.yml
 # Database files
 # ===============================
 *.db
-*.sql
 
 # ===============================
 # Environment files
