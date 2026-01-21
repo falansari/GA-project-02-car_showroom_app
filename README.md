@@ -1,27 +1,22 @@
 # Car Sales API
-General Assembly unit 2 project; a team project settled on a car showroom app for selling brand vehicles
-with customization(s) from available catalogue.
+General Assembly unit 2 project; a team project for a car showroom app for selling brand vehicles
+with customization(s) from available catalogue. The test data is for a Ferrari showroom selling the Ferrari F80 car model. 
 
 ## Tools & Technologies
-- JAVA 17 Spring Framework App
+- JAVA 17 with Spring Boot 4.0.1 Framework
 - Spring Initializr (https://start.spring.io)
-- smartdraw ERD app
+- Spring Boot features (WebMVC, DevTools, Data JPA, Security, Mail)
+- Lombok for reducing boilerplate
+- PostgreSQL Database with PgAdmin 4 dashboard
+- Postman for API Testing
+- JWT (JSON Web Tokens) for authentication
+- LibrePDF for Invoice e-mail
+- SmartDraw ERD app (trial period)
 - Copilot for debugging support
 
 ## Entity Relationship Diagram
 Note some changes were made after this ERD was drawn, but access to the ERD was lost due to a paid app gating. 
-![Entity Relationship Diagram v2.5](https://github.com/falansari/GA-project-02-car_showroom_app/blob/ee804a5c5a7e79992ed42f93e7525a6dbd1b7ad5/docs/Car%20Showroom%20ERD%20v2.5.png)
-
-### ERD Changes
-- OrderLines no longer exists, as 1 order has 1 car only.
-- Orders table changes: 
-  - isApproved in Orders removed, as only a salesman or admin may create an order so it's already approved.
-  - order_date removed as it's same as default createdAt column.
-  - car_id FK added.
-- Manufacturer added to CarModels.
-- createdAt and updatedAt in every table.
-- Users have added columns email_address, role, user_status, verified.
-- UserProfile removed column email_address.
+![Entity Relationship Diagram](docs/ERD from DB.png)
 
 ## Team Members
 - Fatima Abdulla Alansari
@@ -33,6 +28,7 @@ Note some changes were made after this ERD was drawn, but access to the ERD was 
     - Order requests
   - Pull Request Reviews
   - ERD Design
+  - Testing & Data Entry
 - Nadia Husain
   - User Management System:
     - Security management
@@ -42,6 +38,7 @@ Note some changes were made after this ERD was drawn, but access to the ERD was 
     - E-mail verification
     - Soft delete users
   - Pull Request Reviews
+  - Testing
 - Sara Jalal
   - ERD Design
   - URL Endpoints Design
@@ -120,6 +117,13 @@ Note some changes were made after this ERD was drawn, but access to the ERD was 
 - getOrdersByOrderDateBetween: GET /between
 - createOrder: POST api/orders
 
+## Setup Instructions
+1. [Clone the repository](https://github.com/falansari/GA-project-02-car_showroom_app.git)
+2. Create an empty database named Showroom in pgAdmin 4
+3. Execute the data.sql file in docs folder in your database's query tool
+4. Copy application-example.properties file, and name the copy application.properties, and update the details inside for your connection info
+5. You can set up your own PostMan endpoints or use [this link](https://fatima-a-alansari-2491005.postman.co/workspace/JDB-PT-01~1df33fc2-4665-40ca-b39e-984c9ae80813/collection/50802600-76c07528-92ea-4577-a9cd-aae0ea66a8c9?action=share&creator=50802600)
+
 ## Implemented Features List
 - Persisting 10 models.
 - Environment settings with Spring Profiles.
@@ -132,8 +136,8 @@ Note some changes were made after this ERD was drawn, but access to the ERD was 
 - Role Management: 3 different types of users.
 - Email verification Users needs to validate their email before being able to log in.
 - File Upload Feature Users should be able to upload single images.
-- Soft Delete Deleting the user with the admin role should do soft delete. (userStatus = InActive)
-- Forget Password/ Password Recovery Users should be able to recover the account in case they forgets the password.
+- Soft Delete Deleting the user with the admin role should do soft-delete. (userStatus = InActive)
+- Forget Password/ Password Recovery Users should be able to recover the account in case they forget the password.
 - Change Password User should be able to change the password.
 - User Profile User should be able to update his/her own profile including profile picture.
 - Seed File Seed the database before running your application for the first time.
@@ -153,11 +157,11 @@ and assigned themselves to them. Each issue gets its own temporary branch that g
 then merged after a Pull Request review by another team member.
 
 ## Unsolved Problems
-- Generate image through a third party API was attempted as a feature add-on however all of the APIs were paid only or too restrictive for our use case so it couldn't be implemented.
+- Generate image through a third party API was attempted as a feature add-on however all the APIs were paid only or too restrictive for our use case so it couldn't be implemented.
 
 ## Overcome Major Hurdles
 - Forget/Reset Password feature was challenging due to having multiple steps such as sending email, generating token, updating user password etc. We managed to overcome this by seeking help from the instructor assistant.
 - Overcame merging conflicts with good communication.
 - Early on there were a lot of git conflict issues, they were resolved by adding stricter contribution rules and updating the .gitignore file to include OS-specific files and other setting files.
 - The addition of Spring Security hijacked the custom exception messages we had made originally, but we fixed that by adding a GlobalExceptionHandler.
-- The work load was excessive as it's quite a large app concept but we pushed it through.
+- The work load was excessive as it's quite a large app concept, but we pushed it through.
