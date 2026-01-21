@@ -257,9 +257,9 @@ public class PdfGenerationService {
 
         helper.setTo(order.getCustomer().getEmailAddress());
         helper.setFrom("no-reply@showroom.com");
-        helper.setSubject("Showroom Receipt");
+        helper.setSubject("Ferrari Order Receipt");
         helper.setText(
-                "Dear " + order.getCustomer().getUserProfile().getFirstName() + " " + order.getCustomer().getUserProfile().getLastName()+",\n\nPlease find attached your receipt.\n\nRegards,\nShowroom Team"
+                "Dear " + order.getCustomer().getUserProfile().getFirstName() + " " + order.getCustomer().getUserProfile().getLastName()+",\n\nPlease find attached your receipt.\n\nRegards,\nFerrari Team"
         );
 
         helper.addAttachment(
