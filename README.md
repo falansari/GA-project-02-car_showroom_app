@@ -29,6 +29,7 @@ Note some changes were made after this ERD was drawn, but access to the ERD was 
   - Pull Request Reviews
   - ERD Design
   - Testing & Data Entry
+  - JavaDoc & Documentation
 - Nadia Husain
   - User Management System:
     - Security management
@@ -39,6 +40,7 @@ Note some changes were made after this ERD was drawn, but access to the ERD was 
     - Soft delete users
   - Pull Request Reviews
   - Testing
+  - Endpoints Documentation
 - Sara Jalal
   - ERD Design
   - URL Endpoints Design
