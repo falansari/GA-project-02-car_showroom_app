@@ -27,14 +27,16 @@ import static com.ga.showroom.service.UserService.getCurrentLoggedInUser;
 public class PdfGenerationService {
 
     private final JavaMailSender mailSender;
-    private OrderRepository orderRepository;
+    private final OrderService orderService;
     private final Font titleFont = new Font(Font.HELVETICA, 18, Font.BOLD);
     private final Font headerFont = new Font(Font.HELVETICA, 10, Font.BOLD);
     private final Font textFont = new Font(Font.HELVETICA, 10, Font.NORMAL);
     Color mainColor = new Color(190, 220, 216);
 
-    public PdfGenerationService(JavaMailSender mailSender) {
+    public PdfGenerationService(JavaMailSender mailSender,  OrderService orderService) {
+
         this.mailSender = mailSender;
+        this.orderService = orderService;
     }
 
     PdfPCell headerInline(String input) {
@@ -94,7 +96,9 @@ public class PdfGenerationService {
     public String generateOrderReceipt(Long orderId) throws MessagingException {
         if(!getCurrentLoggedInUser().getRole().equals(Role.ADMIN) && !getCurrentLoggedInUser().getRole().equals(Role.SALESMAN))
             throw new AccessDeniedException("You are not authorized to send order receipt. Please contact a salesman or admin.");
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new InformationNotFoundException("The order " +orderId + " is not exist"));
+
+        Order order = orderService.getById(orderId);
+        if (order == null) throw new InformationNotFoundException("Order with ID" + orderId + " does not exist");
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Document document = new Document(PageSize.A4, 36, 36, 48, 36);
@@ -138,8 +142,6 @@ public class PdfGenerationService {
             rightCell.setBackgroundColor(mainColor);
             rightCell.setFixedHeight(60);
             rightCell.setPadding(10);
-
-
 
             headerTable.addCell(leftCell);
             headerTable.addCell(rightCell);

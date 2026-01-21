@@ -109,8 +109,8 @@ public class OrderController {
      * Get the order receipt attachment
      * @param orderId Long
      */
-    @GetMapping(path = "/orders/{orderId}/receipt")
-    public String generateOrderReceipt(@PathVariable Long orderId) throws MessagingException {
+    @GetMapping(path = "/{orderId}/receipt")
+    public String generateOrderReceipt(@PathVariable("orderId") Long orderId) throws MessagingException {
         return pdfGenerationService.generateOrderReceipt(orderId);
     }
 }
