@@ -12,6 +12,7 @@ with customization(s) from available catalogue. The test data is for a Ferrari s
 - JWT (JSON Web Tokens) for authentication
 - LibrePDF for Invoice e-mail
 - SmartDraw ERD app (trial period)
+- GitHub with [GitHub Kanban Project Board](https://github.com/users/falansari/projects/12/views/1)
 - Copilot for debugging support
 
 ## Entity Relationship Diagram
