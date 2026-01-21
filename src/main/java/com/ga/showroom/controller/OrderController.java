@@ -4,6 +4,8 @@ import com.ga.showroom.model.Car;
 import com.ga.showroom.model.Order;
 import com.ga.showroom.model.request.CreateOrderRequest;
 import com.ga.showroom.service.OrderService;
+import com.ga.showroom.service.PdfGenerationService;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +23,12 @@ public class OrderController {
      */
     @Autowired
     private OrderService orderService;
+
+    /**
+     * Initialize pdfGenerationService
+     */
+    @Autowired
+    private PdfGenerationService pdfGenerationService;
 
     /**
      * Get all orders in storage
@@ -95,5 +103,14 @@ public class OrderController {
             List<Long> optionIds = request.getOptions();
 
             return orderService.createOrder(car, modelId, ownerId,optionIds);
+    }
+
+    /**
+     * Get the order receipt attachment
+     * @param orderId Long
+     */
+    @GetMapping(path = "/{orderId}/receipt")
+    public String generateOrderReceipt(@PathVariable("orderId") Long orderId) throws MessagingException {
+        return pdfGenerationService.generateOrderReceipt(orderId);
     }
 }
