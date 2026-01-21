@@ -1,6 +1,5 @@
 package com.ga.showroom.service;
 
-import com.ga.showroom.ShowroomApplication;
 import com.ga.showroom.exception.AccessDeniedException;
 import com.ga.showroom.exception.InformationNotFoundException;
 import com.ga.showroom.model.*;
@@ -13,8 +12,6 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -22,11 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Year;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 import static com.ga.showroom.service.UserService.getCurrentLoggedInUser;
 
@@ -99,7 +92,7 @@ public class PdfGenerationService {
     }
 
     public String generateOrderReceipt(Long orderId) throws MessagingException {
-        if(!getCurrentLoggedInUser().getRole().equals(Role.ADMIN) && ! getCurrentLoggedInUser().getRole().equals(Role.SALESMAN))
+        if(!getCurrentLoggedInUser().getRole().equals(Role.ADMIN) && !getCurrentLoggedInUser().getRole().equals(Role.SALESMAN))
             throw new AccessDeniedException("You are not authorized to send order receipt. Please contact a salesman or admin.");
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new InformationNotFoundException("The order " +orderId + " is not exist"));
 
@@ -276,49 +269,4 @@ public class PdfGenerationService {
         mailSender.send(message);
         return "Email sent to " + order.getCustomer().getEmailAddress();
     }
-
-//    // ⚠️ For testing only – not recommended in production
-//    public static void main(String[] args) throws Exception {
-//        ConfigurableApplicationContext context =
-//                SpringApplication.run(ShowroomApplication.class, args);
-//
-//        PdfGenerationService pdfService =
-//                context.getBean(PdfGenerationService.class);
-//        Order order = new Order();
-//        order.setCreatedAt(LocalDateTime.now());
-//        order.setTotalPrice(30000493.0);
-//        UserProfile userProfile = new UserProfile();
-//        userProfile.setFirstName("Sara");
-//        userProfile.setLastName("Alkhozaae");
-//        userProfile.setPhoneNumber(Long.parseLong("9723012210"));
-//        userProfile.setCpr(Long.parseLong("892364198319"));
-//        userProfile.setHomeAddress("Tubli, 711");
-//        User user = new User();
-//        user.setUserProfile(userProfile);
-//        user.setEmailAddress("sarauobeducation@gmail.com");
-//        order.setCustomer(user);
-//        CarModel carModel = new CarModel();
-//        carModel.setName("Sorinto");
-//        carModel.setMakeYear(Year.now());
-//        carModel.setManufacturer("Kia");
-//        carModel.setPrice(30000.0);
-//        Car car = new Car();
-//        car.setInsurancePolicy("havsghsa");
-//        car.setRegistrationNumber("jasgvydiuaw");
-//        car.setVinNumber("yufadyuwd");
-//        car.setCarModel(carModel);
-//        OptionCategory optionCategory1 = new OptionCategory();
-//        optionCategory1.setName("Color");
-//        Option option1 = new Option();
-//        option1.setName("Red");
-//        option1.setPrice(3.4);
-//        option1.setOptionCategory(optionCategory1);
-//        CarOption carOption1 = new CarOption();
-//        carOption1.setOption(option1);
-//        car.setCarOptions(List.of(carOption1, carOption1, carOption1));
-//        order.setCar(car);
-//
-//        pdfService.generateOrderReceipt(order);
-//    }
 }
-
