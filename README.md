@@ -125,8 +125,9 @@ Note some changes were made after this ERD was drawn, but access to the ERD was 
 1. [Clone the repository](https://github.com/falansari/GA-project-02-car_showroom_app.git)
 2. Create an empty database named Showroom in pgAdmin 4
 3. Execute the data.sql file in docs folder in your database's query tool
-4. Copy application-example.properties file, and name the copy application.properties, and update the details inside for your connection info
-5. You can set up your own PostMan endpoints or use [this link](https://fatima-a-alansari-2491005.postman.co/workspace/JDB-PT-01~1df33fc2-4665-40ca-b39e-984c9ae80813/collection/50802600-76c07528-92ea-4577-a9cd-aae0ea66a8c9?action=share&creator=50802600)
+4. Extract the contents of the [uploads.zip](docs/uploads.zip) file in docs/uploads.zip to the project's root directory.
+5. Copy application-example.properties file, and name the copy application.properties, and update the details inside for your connection info
+6. You can set up your own PostMan endpoints or use [this link](https://fatima-a-alansari-2491005.postman.co/workspace/JDB-PT-01~1df33fc2-4665-40ca-b39e-984c9ae80813/collection/50802600-76c07528-92ea-4577-a9cd-aae0ea66a8c9?action=share&creator=50802600)
 
 ## Implemented Features List
 - Persisting 10 models.
