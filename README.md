@@ -25,7 +25,7 @@ Note some changes were made after this ERD was drawn, but access to the ERD was 
   - App Logic & Development:
     - Services & Controllers
     - Exception handling
-    - File uploads and downloads
+    - File downloads and delete
     - Order requests
   - Pull Request Reviews
   - ERD Design
@@ -39,6 +39,7 @@ Note some changes were made after this ERD was drawn, but access to the ERD was 
     - Password management
     - E-mail verification
     - Soft delete users
+  - File uploads
   - Pull Request Reviews
   - Testing
   - Endpoints Documentation
